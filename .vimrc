@@ -13,6 +13,8 @@ set cursorline
 hi CursorLine cterm=NONE ctermbg=235
 set colorcolumn=80
 hi ColorColumn ctermbg=lightgrey guibg=lightgrey
+hi Conceal ctermbg=DarkBlue
+
 
 hi Pmenu ctermfg=Black ctermbg=238
 hi PmenuSel ctermfg=Grey ctermbg=Black

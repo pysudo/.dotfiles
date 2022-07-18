@@ -45,6 +45,9 @@ call plug#begin()
 " Full language server protocol
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
+" Debug Adapter Protocol client implementation for Neovim
+Plug 'mfussenegger/nvim-dap'
+
 " Mappings to easily delete, change and add \"surroundings\" in pairs.
 Plug 'tpope/vim-surround'
 
@@ -89,4 +92,47 @@ nmap <Leader>qf  <Plug>(coc-fix-current)
 
 " Run the Code Lens action on the current line.
 nmap <Leader>cl  <Plug>(coc-codelens-action)
+
+" **************************** Plug vim.dap ***********************************
+nnoremap <silent> <F5> <Cmd>lua require'dap'.continue()<CR>
+nnoremap <silent> <F10> <Cmd>lua require'dap'.step_over()<CR>
+nnoremap <silent> <F11> <Cmd>lua require'dap'.step_into()<CR>
+nnoremap <silent> <F12> <Cmd>lua require'dap'.step_out()<CR>
+nnoremap <silent> <Leader>b <Cmd>lua require'dap'.toggle_breakpoint()<CR>
+nnoremap <silent> <Leader>B <Cmd>lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
+nnoremap <silent> <Leader>lp <Cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>
+nnoremap <silent> <Leader>dr <Cmd>lua require'dap'.repl.open()<CR>
+nnoremap <silent> <Leader>dl <Cmd>lua require'dap'.run_last()<CR>
+
+
+" ---------------------------- Config -----------------------------------------
+" **************************** Plug vim.dap ***********************************
+lua <<EOF
+  local dap = require('dap')
+  dap.adapters.node = {
+    type = 'executable',
+    command = 'node',
+    -- Install vscode-node-debug2 on the specified path.
+    args = {os.getenv('HOME') .. '/dev/microsoft/vscode-node-debug2/out/src/nodeDebug.js'},
+  }
+  dap.configurations.javascript = {
+    {
+      name = 'Launch',
+      type = 'node',
+      request = 'launch',
+      program = '${file}',
+      cwd = vim.fn.getcwd(),
+      sourceMaps = true,
+      protocol = 'inspector',
+      console = 'integratedTerminal',
+    },
+    {
+      -- For this to work you need to make sure the node process is started with the `--inspect` flag.
+      name = 'Attach to process',
+      type = 'node',
+      request = 'attach',
+      processId = require'dap.utils'.pick_process,
+    },
+  }
+EOF
 

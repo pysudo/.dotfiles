@@ -27,6 +27,7 @@ set shiftwidth=2
 set expandtab
 set smartcase
 
+
 " **************************** Plug coc.nvim **********************************
 " Always show the signcolumn, otherwise it would shift the text each time
 " diagnostics appear/become resolved.
@@ -42,7 +43,7 @@ endif
 " Initialize plugin system
 call plug#begin()
 
-" Full language server protocol
+" Full language server protocol.
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 " Debug Adapter Protocol client implementation for Neovim
@@ -50,6 +51,9 @@ Plug 'mfussenegger/nvim-dap'
 
 " Mappings to easily delete, change and add \"surroundings\" in pairs.
 Plug 'tpope/vim-surround'
+
+" A multi language graphical debugger for Vim.
+Plug 'puremourning/vimspector'
 
 call plug#end()
 
@@ -103,6 +107,19 @@ nnoremap <silent> <Leader>B <Cmd>lua require'dap'.set_breakpoint(vim.fn.input('B
 nnoremap <silent> <Leader>lp <Cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>
 nnoremap <silent> <Leader>dr <Cmd>lua require'dap'.repl.open()<CR>
 nnoremap <silent> <Leader>dl <Cmd>lua require'dap'.run_last()<CR>
+
+" **************************** Plug vimspector ********************************
+nnoremap <Leader>dd :call vimspector#Launch()<CR>
+nnoremap <Leader>de :call vimspector#Reset()<CR>
+nnoremap <Leader>dc :call vimspector#Continue()<CR>
+
+nnoremap <Leader>dt :call vimspector#ToggleBreakpoint()<CR>
+nnoremap <Leader>dT :call vimspector#ClearBreakpoints()<CR>
+
+nmap <Leader>dk <Plug>VimspectorRestart
+nmap <Leader>dh <Plug>VimspectorStepOut
+nmap <Leader>dl <Plug>VimspectorStepInto
+nmap <Leader>dj <Plug>VimspectorStepOver
 
 
 " ---------------------------- Config -----------------------------------------

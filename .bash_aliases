@@ -1,7 +1,8 @@
 alias vi="nvim"
 alias vim="nvim"
 
-# Check if system is running via WSL
+
+# Open current location with windows native explorer.
 if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
-  alias winopen='cmd.exe /C start .'
+  alias open='explorer.exe'
 fi

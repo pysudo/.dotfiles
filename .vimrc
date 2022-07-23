@@ -2,6 +2,7 @@
 set nocompatible
 syntax on
 set number
+set nowrap
 set incsearch
 set hlsearch
 set wildmenu
@@ -28,7 +29,7 @@ set expandtab
 set smartcase
 
 
-" **************************** Plug coc.nvim **********************************
+" **************************** coc.nvim ***************************************
 " Always show the signcolumn, otherwise it would shift the text each time
 " diagnostics appear/become resolved.
 if has("nvim-0.5.0") || has("patch-8.1.1564")
@@ -38,16 +39,13 @@ else
   set signcolumn=yes
 endif
 
-"                             
+
 " ---------------------------- Plugin Manager ---------------------------------
 " Initialize plugin system
 call plug#begin()
 
-" Full language server protocol.
+" Full language server protocol. (Also works for vim)
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
-" Debug Adapter Protocol client implementation for Neovim
-Plug 'mfussenegger/nvim-dap'
 
 " Mappings to easily delete, change and add \"surroundings\" in pairs.
 Plug 'tpope/vim-surround'
@@ -55,11 +53,16 @@ Plug 'tpope/vim-surround'
 " A multi language graphical debugger for Vim.
 Plug 'puremourning/vimspector'
 
+if has("nvim")
+  " Debug Adapter Protocol client implementation for Neovim
+  Plug 'mfussenegger/nvim-dap'
+endif
+
 call plug#end()
 
 
 " ---------------------------- Mappings ---------------------------------------
-" **************************** Plug coc.nvim **********************************
+" **************************** coc.nvim ***************************************
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
@@ -97,18 +100,20 @@ nmap <Leader>qf  <Plug>(coc-fix-current)
 " Run the Code Lens action on the current line.
 nmap <Leader>cl  <Plug>(coc-codelens-action)
 
-" **************************** Plug vim.dap ***********************************
-nnoremap <silent> <F5> <Cmd>lua require'dap'.continue()<CR>
-nnoremap <silent> <F10> <Cmd>lua require'dap'.step_over()<CR>
-nnoremap <silent> <F11> <Cmd>lua require'dap'.step_into()<CR>
-nnoremap <silent> <F12> <Cmd>lua require'dap'.step_out()<CR>
-nnoremap <silent> <Leader>b <Cmd>lua require'dap'.toggle_breakpoint()<CR>
-nnoremap <silent> <Leader>B <Cmd>lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
-nnoremap <silent> <Leader>lp <Cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>
-nnoremap <silent> <Leader>dr <Cmd>lua require'dap'.repl.open()<CR>
-nnoremap <silent> <Leader>dl <Cmd>lua require'dap'.run_last()<CR>
+" **************************** nvim.dap ***************************************
+if has("nvim")
+  nnoremap <silent> <F5> <Cmd>lua require'dap'.continue()<CR>
+  nnoremap <silent> <F10> <Cmd>lua require'dap'.step_over()<CR>
+  nnoremap <silent> <F11> <Cmd>lua require'dap'.step_into()<CR>
+  nnoremap <silent> <F12> <Cmd>lua require'dap'.step_out()<CR>
+  nnoremap <silent> <Leader>b <Cmd>lua require'dap'.toggle_breakpoint()<CR>
+  nnoremap <silent> <Leader>B <Cmd>lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
+  nnoremap <silent> <Leader>lp <Cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>
+  nnoremap <silent> <Leader>dr <Cmd>lua require'dap'.repl.open()<CR>
+  nnoremap <silent> <Leader>dl <Cmd>lua require'dap'.run_last()<CR>
+endif
 
-" **************************** Plug vimspector ********************************
+" **************************** vimspector *************************************
 nnoremap <Leader>dd :call vimspector#Launch()<CR>
 nnoremap <Leader>de :call vimspector#Reset()<CR>
 nnoremap <Leader>dc :call vimspector#Continue()<CR>
@@ -123,7 +128,8 @@ nmap <Leader>dj <Plug>VimspectorStepOver
 
 
 " ---------------------------- Config -----------------------------------------
-" **************************** Plug vim.dap ***********************************
+" **************************** nvim.dap ***************************************
+if has("nvim")
 lua <<EOF
   local dap = require('dap')
   dap.adapters.node = {
@@ -152,4 +158,5 @@ lua <<EOF
     },
   }
 EOF
+endif
 

@@ -1,8 +1,0 @@
-#!/usr/bin/bash
-
-# Javascript debug adapter and configuration for nvim-dap
-cd $HOME && mkdir -p ./dev/microsoft && cd ./dev/microsoft
-git clone https://github.com/microsoft/vscode-node-debug2.git
-cd vscode-node-debug2
-npm install
-NODE_OPTIONS=--no-experimental-fetch npm run build

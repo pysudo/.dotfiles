@@ -46,6 +46,7 @@ call plug#begin()
 
 " Full language server protocol. (Also works for vim)
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+let g:coc_global_extensions = ["coc-sh"] " Install basic LSPs
 
 " Mappings to easily delete, change and add \"surroundings\" in pairs.
 Plug 'tpope/vim-surround'

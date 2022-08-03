@@ -39,6 +39,8 @@ else
   set signcolumn=yes
 endif
 
+let g:coc_disable_startup_warning = 1
+
 
 " ---------------------------- Plugin Manager ---------------------------------
 " Initialize plugin system

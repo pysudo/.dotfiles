@@ -20,7 +20,7 @@ throwUsage () {
 
 # Ignore or execute forceOverwriteal commands, if it doesn't exists.
 executeCommandList() {
-  if [ $# -eq 0 ]
+  if [[ $# -eq 0 ]]
   then
     return 0
   fi
@@ -54,14 +54,14 @@ modifyPath() {
  
   
   # Check existance of a path
-  if ! [[ -f $path || -d $path ]]
+  if [[ $(find $path -maxdepth 0 | wc) -eq 0 ]]
   then
     executeCommandList "$@"
     return 0
   fi
 
   local response
-  if [ $forceOverwrite = "f" ]
+  if [[ $forceOverwrite = "f" ]]
   then
     response="Y"
   fi
@@ -77,13 +77,13 @@ modifyPath() {
    return 0
   fi
   
-  if [[ $response = "Y" && -f $path ]]
+  if [[ $response = "Y" && -d $path ]]
   then
-    rm $path
+    rm -rf $path
     executeCommandList "$@"
     return 0
   else
-    rm -rf $path
+    rm $path
     executeCommandList "$@"
     return 0
   fi
@@ -98,7 +98,7 @@ sudo apt-get install -y curl
 echo -e "\n"
 echo -e "\e[7mInstalling Neovim...\e[0m"
 sudo apt-get install -y software-properties-common # add-apt-repository for configuring ppa
-if ! [ -f /etc/apt/sources.list.d/neovim-ppa-ubuntu-stable-bionic.list ]
+if ! [[ -f /etc/apt/sources.list.d/neovim-ppa-ubuntu-stable-bionic.list ]]
 then
   sudo add-apt-repository -y ppa:neovim-ppa/stable
   sudo apt-get update

@@ -39,7 +39,10 @@ else
   set signcolumn=yes
 endif
 
-let g:coc_disable_startup_warning = 1
+" Remove comment to disable vim version recommendation warning for older
+" versions of ubuntu.
+" let g:coc_disable_startup_warning = 1
+
 
 
 " ---------------------------- Plugin Manager ---------------------------------
@@ -117,13 +120,20 @@ if has("nvim")
 endif
 
 " **************************** vimspector *************************************
-nnoremap <Leader>dd :call vimspector#Launch()<CR>
-nnoremap <Leader>de :call vimspector#Reset()<CR>
-nnoremap <Leader>dc :call vimspector#Continue()<CR>
+" If set to 'HUMAN' disable the rest below as to not pollute the keyspace.
+" let g:vimspector_enable_mappings = 'HUMAN'
 
+" Breakpoints.
 nnoremap <Leader>dt :call vimspector#ToggleBreakpoint()<CR>
 nnoremap <Leader>dT :call vimspector#ClearBreakpoints()<CR>
 
+" Initialization.
+nnoremap <Leader>dd :call vimspector#Launch()<CR>
+nnoremap <Leader>df :call vimspector#RunToCursor()<CR>
+nnoremap <Leader>de :call vimspector#Reset()<CR>
+nnoremap <Leader>dc :call vimspector#Continue()<CR>
+
+" Navigation.
 nmap <Leader>dk <Plug>VimspectorRestart
 nmap <Leader>dh <Plug>VimspectorStepOut
 nmap <Leader>dl <Plug>VimspectorStepInto

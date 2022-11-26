@@ -54,7 +54,7 @@ modifyPath() {
  
   
   # Check existance of a path
-  if [[ $(find $path -maxdepth 0 | wc) -eq 0 ]]
+  if [[ $(find $path -maxdepth 0 2> /dev/null | wc -w) -eq 0 ]]
   then
     executeCommandList "$@"
     return 0
@@ -141,6 +141,7 @@ then
   echo -e "\n"
   echo -e "\e[7mInstalling node...\e[0m"
   nvm install --lts
+  nvm use node # Switch to default node version.
   
   # Javascript debug adapter and configuration for nvim-dap
   echo -e "\n"
@@ -150,7 +151,7 @@ then
     "git clone https://github.com/microsoft/vscode-node-debug2.git" \
     "cd vscode-node-debug2" \
     "npm install" \
-    "NODE_forceOverwriteS=--no-experimental-fetch npm run build"
+    "NODE_OPTIONS=--no-experimental-fetch npm run build"
 else
   echo -e "\e[31mnvm could not be found. Skipping node installation.\e[0m"
   echo -e "\e[31mnode could not be installed. Skipping vscode-node-debug2 installation.\e[0m"

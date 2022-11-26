@@ -1,6 +1,37 @@
+" ---------------------------- Plugin Manager ---------------------------------
+" Initialize plugin system
+call plug#begin()
+
+" Full language server protocol. (Also works for vim)
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+let g:coc_global_extensions = ["coc-sh"] " Install basic LSPs
+
+" Mappings to easily delete, change and add \"surroundings\" in pairs.
+Plug 'tpope/vim-surround'
+
+" A multi language graphical debugger for Vim.
+Plug 'puremourning/vimspector'
+
+" A dark Vim/Neovim color scheme.
+Plug 'morhetz/gruvbox'
+let g:gruvbox_contrast_dark = "hard"
+
+" Status/tabline for vim/nvim.
+Plug 'vim-airline/vim-airline'
+
+if has("nvim")
+  " Debug Adapter Protocol client implementation for Neovim
+  Plug 'mfussenegger/nvim-dap'
+endif
+
+call plug#end()
+
+
 " ---------------------------- General ----------------------------------------
 set nocompatible
 syntax on
+autocmd vimenter * ++nested colorscheme gruvbox
+
 set number
 set nowrap
 set incsearch
@@ -15,7 +46,6 @@ hi CursorLine cterm=NONE ctermbg=235
 set colorcolumn=80
 hi ColorColumn ctermbg=lightgrey guibg=lightgrey
 hi Conceal ctermbg=DarkBlue
-
 
 hi Pmenu ctermfg=Black ctermbg=238
 hi PmenuSel ctermfg=Grey ctermbg=Black
@@ -42,29 +72,6 @@ endif
 " Remove comment to disable vim version recommendation warning for older
 " versions of ubuntu.
 " let g:coc_disable_startup_warning = 1
-
-
-
-" ---------------------------- Plugin Manager ---------------------------------
-" Initialize plugin system
-call plug#begin()
-
-" Full language server protocol. (Also works for vim)
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-let g:coc_global_extensions = ["coc-sh"] " Install basic LSPs
-
-" Mappings to easily delete, change and add \"surroundings\" in pairs.
-Plug 'tpope/vim-surround'
-
-" A multi language graphical debugger for Vim.
-Plug 'puremourning/vimspector'
-
-if has("nvim")
-  " Debug Adapter Protocol client implementation for Neovim
-  Plug 'mfussenegger/nvim-dap'
-endif
-
-call plug#end()
 
 
 " ---------------------------- Mappings ---------------------------------------

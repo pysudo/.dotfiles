@@ -19,6 +19,16 @@ let g:gruvbox_contrast_dark = "hard"
 " Status/tabline for vim/nvim.
 Plug 'vim-airline/vim-airline'
 
+" A file system explorer.
+Plug 'scrooloose/nerdtree'
+
+" Enables NERDTree to open, delete, move, or copy multiple files at once.
+Plug 'PhilRunninger/nerdtree-visual-selection'
+
+" A plugin of NERDTree showing git status flags.
+Plug 'Xuyuanp/nerdtree-git-plugin'
+let g:NERDTreeGitStatusShowClean = 1
+
 if has("nvim")
   " Debug Adapter Protocol client implementation for Neovim
   Plug 'mfussenegger/nvim-dap'
@@ -145,6 +155,11 @@ nmap <Leader>dk <Plug>VimspectorRestart
 nmap <Leader>dh <Plug>VimspectorStepOut
 nmap <Leader>dl <Plug>VimspectorStepInto
 nmap <Leader>dj <Plug>VimspectorStepOver
+
+
+" **************************** nerdtree ***************************************
+nnoremap <C-n> :NERDTree<CR>
+nnoremap <C-t> :NERDTreeToggle<CR>
 
 
 " ---------------------------- Config -----------------------------------------

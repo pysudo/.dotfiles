@@ -81,7 +81,7 @@ endif
 
 " Remove comment to disable vim version recommendation warning for older
 " versions of ubuntu.
-" let g:coc_disable_startup_warning = 1
+let g:coc_disable_startup_warning = 1
 
 
 " ---------------------------- Mappings ---------------------------------------

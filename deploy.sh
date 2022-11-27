@@ -5,19 +5,6 @@ getopts ":f" forceOverwrite
 initDir=$(pwd)
 
 
-throwError() { echo -e "\n\e[31m${FUNCNAME[1]}: line ${BASH_LINENO[0]}: $*\e[m" >&2; }
-
-
-throwUsage () {
-  local usage 
-  for usage in "$@" ; do
-      echo -e "$usage"
-  done
-  
-  return 0
-}
-
-
 # Ignore or execute forceOverwriteal commands, if it doesn't exists.
 executeCommandList() {
   if [[ $# -eq 0 ]]
@@ -32,40 +19,29 @@ executeCommandList() {
 }
 
 
-modifyPath() {
+# Check if specified path exists in the file system.
+checkPath() { 
   local path=$1
-  shift
   
-  if ! [[ $path =~ ^(/[^/ ]*)+/?$ ]]
-  then
-    throwError "Invalid arguments."
-    throwUsage \
-      "   Usage: modifyPath <ABSOULTE_PATH> [COMMANDS...]" \
-      "   Removes existing path. How the path is modified depends on the optional commands passed or commands executed after function call." \
-      "" \
-      "   Options:" \
-      "     -p" \
-      "         Absolute path to a file or directory." \
-      "" \
-      "   Example:" \
-      "     modifyPath /random/path/to/file/or/directory -c \"echo first command\" \"echo -e second command\""
-    return 1
-  fi
- 
-  
-  # Check existance of a path
   if [[ $(find $path -maxdepth 0 2> /dev/null | wc -w) -eq 0 ]]
   then
-    executeCommandList "$@"
-    return 0
+    false
+  else
+    true
   fi
+}
 
-  local response
+
+# User prompt for overwriting a specified path.
+queryOverwrite() {
   if [[ $forceOverwrite = "f" ]]
   then
-    response="Y"
+    return 0
   fi
   
+  local path=$1
+  
+  local response
   while ! [[ $response =~ ^(Y|n|N)$ ]]
   do
     echo -e "\n$path already exists. Do you wish to overwrite it? [Y/n]"
@@ -74,19 +50,46 @@ modifyPath() {
 
   if [[ $response =~ ^(n|N)$ ]]
   then
-   return 0
+   return 1
   fi
   
-  if [[ $response = "Y" && -d $path ]]
+  return 0
+}
+
+
+<<"modify-path"
+  Prompt the user for deleting an exisiting path and its replacement of space
+  seperated strings as commands should be specified.
+  Usage: modifyPath <ABSOULTE_PATH> [COMMANDS...]
+modify-path
+modifyPath() {
+  getopts ":f" forceModify
+  if [[ $forceModify = "f" ]]
+  then
+    shift
+  fi
+  
+  local path=$1
+  shift
+  
+  if ! checkPath $path; then executeCommandList "$@"; return 0; fi
+  
+  queryOverwrite $path
+  local response=$?
+  
+  if [[ ($forceModify = "f" || response -eq 0) && -d $path ]]
   then
     rm -rf $path
     executeCommandList "$@"
     return 0
-  else
+  elif [[ $forceModify = "f" || response -eq 0 ]]
+  then
     rm $path
     executeCommandList "$@"
     return 0
   fi
+  
+  return 1
 }
 
 
@@ -150,8 +153,11 @@ then
   modifyPath "$PWD/vscode-node-debug2" \
     "git clone https://github.com/microsoft/vscode-node-debug2.git" \
     "cd vscode-node-debug2" \
-    "npm install" \
-    "NODE_OPTIONS=--no-experimental-fetch npm run build"
+    "npm install"
+  if [[ $? -eq 0 ]] # Build only if path is modified or newly created.
+  then
+    NODE_OPTIONS=--no-experimental-fetch npm run build
+  fi
 else
   echo -e "\e[31mnvm could not be found. Skipping node installation.\e[0m"
   echo -e "\e[31mnode could not be installed. Skipping vscode-node-debug2 installation.\e[0m"
@@ -163,14 +169,15 @@ echo -e "\n"
 vimConfigPath=$HOME/.vimrc
 modifyPath $vimConfigPath \
   "ln -s $initDir/.vimrc $vimConfigPath" \
-  "echo -e 'Created symlink \033[1;36m$initDir/.vimrc -> $HOME/.vimrc\e[0m'" \
-  "echo -e '\e[33mcoc startup warning has been disabled. Ensure Vim or Neovim is using the right version for coc.nvim\e[0m'"
+  "echo -e Created symlink \033[1;36m$initDir/.vimrc -> $HOME/.vimrc\e[0m" \
+  "echo -e \e[33mcoc startup warning has been disabled. Ensure Vim or Neovim is using the right version for coc.nvim\e[0m"
 mkdir -p $HOME/.config/nvim
 
+echo -e "\n"
 neovimConfigPath=$HOME/.config/nvim/init.vim
 modifyPath $neovimConfigPath \
   "ln -s $initDir/.vimrc $neovimConfigPath" \
-  "echo -e 'Created symlink \033[1;36m$initDir/.vimrc -> $HOME/.config/nvim/init.vim\e[0m'"
+  "echo -e Created symlink \033[1;36m$initDir/.vimrc -> $HOME/.config/nvim/init.vim\e[0m"
 
 
 # Install extensions for vim and neovim using plugin manager.
@@ -186,13 +193,13 @@ echo -e "\n"
 userDefinedAliasesPath=$HOME/.bash_aliases
 modifyPath $userDefinedAliasesPath \
   "ln -s $initDir/.bash_aliases $userDefinedAliasesPath" \
-  "echo -e 'Created symlink \033[1;36m$initDir/.bash_aliases -> $HOME/.bash_aliases\e[0m'"
+  "echo -e Created symlink \033[1;36m$initDir/.bash_aliases -> $HOME/.bash_aliases\e[0m"
   
 # tmux configuration
 tmuxConfigPath=$HOME/.tmux.conf
 modifyPath $tmuxConfigPath \
   "ln -s $initDir/.tmux.conf $tmuxConfigPath" \
-  "echo -e 'Created symlink \033[1;36m$initDir/.tmux -> $HOME/.tmux.conf\e[0m'"
+  "echo -e Created symlink \033[1;36m$initDir/.tmux -> $HOME/.tmux.conf\e[0m"
 
 echo -e "\n"
 echo -e "\e[34mRestart the terminal for changes to take effect.\e[0m"

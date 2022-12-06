@@ -29,6 +29,14 @@ Plug 'PhilRunninger/nerdtree-visual-selection'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 let g:NERDTreeGitStatusShowClean = 1
 
+" A snippets manager for vim.
+Plug 'SirVer/ultisnips'
+" If you want :UltiSnipsEdit to split your window.
+let g:UltiSnipsEditSplit="vertical"
+
+" Repository containing snippets files for various programming languages.
+Plug 'honza/vim-snippets'
+
 if has("nvim")
   " Debug Adapter Protocol client implementation for Neovim
   Plug 'mfussenegger/nvim-dap'
@@ -103,6 +111,9 @@ function! ShowDocumentation()
   endif
 endfunction
 
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <C-space> coc#refresh()
+
 " Symbol renaming.
 nmap <Leader>rn <Plug>(coc-rename)
 
@@ -161,6 +172,12 @@ nmap <Leader>dj <Plug>VimspectorStepOver
 nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
 
+
+" **************************** nerdtree ***************************************
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsListSnippets="<C-M-space>"
+let g:UltiSnipsJumpForwardTrigger="<C-b>"
+let g:UltiSnipsJumpBackwardTrigger="<C-z>"
 
 " ---------------------------- Config -----------------------------------------
 " **************************** nvim.dap ***************************************

@@ -37,6 +37,18 @@ let g:UltiSnipsEditSplit="vertical"
 " Repository containing snippets files for various programming languages.
 Plug 'honza/vim-snippets'
 
+" Browse undo history and switch between different undo branches.
+Plug 'mbbill/undotree'
+
+" Vim plugin for Git.
+Plug 'tpope/vim-fugitive'
+
+
+" (Do)cumentation (Ge)nerator which will generate a proper documentation.
+" If post-update hook error for nvim, run ':call doge#install()' manully.
+Plug 'kkoomen/vim-doge', { 'do': { -> doge#install() } }
+
+
 if has("nvim")
   " Debug Adapter Protocol client implementation for Neovim
   Plug 'mfussenegger/nvim-dap'
@@ -46,6 +58,7 @@ call plug#end()
 
 
 " ---------------------------- General ----------------------------------------
+let mapleader = " "
 set nocompatible
 syntax on
 autocmd vimenter * ++nested colorscheme gruvbox
@@ -92,6 +105,13 @@ endif
 let g:coc_disable_startup_warning = 1
 
 
+" **************************** ultiSnips **************************************
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsListSnippets="<C-M-space>"
+let g:UltiSnipsJumpForwardTrigger="<C-b>"
+let g:UltiSnipsJumpBackwardTrigger="<C-z>"
+
+
 " ---------------------------- Mappings ---------------------------------------
 " **************************** coc.nvim ***************************************
 " GoTo code navigation.
@@ -134,6 +154,7 @@ nmap <Leader>qf  <Plug>(coc-fix-current)
 " Run the Code Lens action on the current line.
 nmap <Leader>cl  <Plug>(coc-codelens-action)
 
+
 " **************************** nvim.dap ***************************************
 if has("nvim")
   nnoremap <silent> <F5> <Cmd>lua require'dap'.continue()<CR>
@@ -173,11 +194,13 @@ nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
 
 
-" **************************** nerdtree ***************************************
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsListSnippets="<C-M-space>"
-let g:UltiSnipsJumpForwardTrigger="<C-b>"
-let g:UltiSnipsJumpBackwardTrigger="<C-z>"
+" **************************** undotree ***************************************
+nnoremap <leader>u :UndotreeToggle<CR>
+
+
+" **************************** vim-fugitive ***********************************
+nnoremap <leader>gs :Git<CR>
+
 
 " ---------------------------- Config -----------------------------------------
 " **************************** nvim.dap ***************************************
@@ -211,4 +234,3 @@ lua <<EOF
   }
 EOF
 endif
-

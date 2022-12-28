@@ -43,11 +43,9 @@ Plug 'mbbill/undotree'
 " Vim plugin for Git.
 Plug 'tpope/vim-fugitive'
 
-
 " (Do)cumentation (Ge)nerator which will generate a proper documentation.
-" If post-update hook error for nvim, run ':call doge#install()' manully.
+" If post-update hook error, restart vim and ':call doge#install()' manually.
 Plug 'kkoomen/vim-doge', { 'do': { -> doge#install() } }
-
 
 if has("nvim")
   " Debug Adapter Protocol client implementation for Neovim
@@ -58,17 +56,28 @@ call plug#end()
 
 
 " ---------------------------- General ----------------------------------------
-let mapleader = " "
 set nocompatible
 syntax on
-autocmd vimenter * ++nested colorscheme gruvbox
 
+set termguicolors
+set noswapfile
+set nobackup
 set number
+set relativenumber  
 set nowrap
 set incsearch
 set hlsearch
 set wildmenu
 "set wildmode=list:longest
+set scrolloff=8
+
+colorscheme gruvbox
+if (&background == "light")
+  set bg=dark
+endif
+
+hi Normal guibg=NONE ctermbg=NONE
+hi NormalFloat guibg=NONE ctermbg=NONE
 
 set cursorcolumn
 hi CursorColumn cterm=NONE ctermbg=239
@@ -83,14 +92,27 @@ hi PmenuSel ctermfg=Grey ctermbg=Black
 hi PmenuSbar ctermbg=Black
 hi PmenuThumb ctermbg=DarkGrey
 
+set expandtab
+set smartcase
+set smartindent
 set tabstop=2
 set softtabstop=2
 set shiftwidth=2
-set expandtab
-set smartcase
 
+" Presist undo tree for every file when closed and reopened later.
+if has("persistent_undo")
+  let target_path = expand('~/.undodir')
 
-" **************************** coc.nvim ***************************************
+  " create the directory and any parent directories
+  " if the location does not exist.
+  if !isdirectory(target_path)
+    call mkdir(target_path, "p", 0700)
+  endif
+
+  let &undodir=target_path
+  set undofile
+endif
+
 " Always show the signcolumn, otherwise it would shift the text each time
 " diagnostics appear/become resolved.
 if has("nvim-0.5.0") || has("patch-8.1.1564")
@@ -100,6 +122,8 @@ else
   set signcolumn=yes
 endif
 
+
+" **************************** coc.nvim ***************************************
 " Remove comment to disable vim version recommendation warning for older
 " versions of ubuntu.
 let g:coc_disable_startup_warning = 1
@@ -113,6 +137,61 @@ let g:UltiSnipsJumpBackwardTrigger="<C-z>"
 
 
 " ---------------------------- Mappings ---------------------------------------
+let mapleader = " "
+
+" **************************** General ****************************************
+nnoremap <leader>pv :Ex<CR>
+
+" Move higlighted lines.
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
+" Cursor at the beginning when previous line is appended to the current line.
+nnoremap J mzJ`z
+
+" Keep the cursor in the middle when half scrolling or while searching.
+nnoremap <C-d> <C-d>zz
+nnoremap <C-u> <C-u>zz
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
+" Copy text to system clipboard.
+function! IsWSL()
+  if has("unix")
+    let lines = readfile("/proc/version")
+    if lines[0] =~ "[Mm]icrosoft"
+      return 1
+    endif
+  endif
+  return 0
+endfunction
+
+if (IsWSL())
+  " Copy (write) highlighted text to .vimbuffer
+  vnoremap <leader>y y:new ~/.vimbuffer<CR>VGp:x<CR> \| :!cat ~/.vimbuffer \| clip.exe <CR><CR>
+  " Paste from buffer
+  nnoremap <leader>p :r ~/.vimbuffer<CR>
+else
+  nnoremap <leader>y """*y"
+  vnoremap <leader>y """*y"
+  nnoremap <leader>Y """*Y"
+  nnoremap <leader>p """*p"
+endif
+
+" Don't retain deleted text in the numbered register.
+nnoremap <leader>d """_d"
+vnoremap <leader>d """_d"
+
+" When overwritting, presist the copied text and remove the overwritten text.
+xnoremap <leader>p "_dP
+
+" Search and replace the text under the cursor.
+nnoremap <leader>s :%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>
+
+" Make the current file an executable.
+nnoremap <leader>x <cmd>silent !chmod +x %<CR>
+
+
 " **************************** coc.nvim ***************************************
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
@@ -135,37 +214,37 @@ endfunction
 inoremap <silent><expr> <C-space> coc#refresh()
 
 " Symbol renaming.
-nmap <Leader>rn <Plug>(coc-rename)
+nmap <leader>rn <Plug>(coc-rename)
 
 " Formatting selected code.
-xmap <Leader>f  <Plug>(coc-format-selected)
-nmap <Leader>f  <Plug>(coc-format-selected)
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
 
 " Applying codeAction to the selected region.
-" Example: `<Leader>aap` for current paragraph
-xmap <Leader>a  <Plug>(coc-codeaction-selected)
-nmap <Leader>a  <Plug>(coc-codeaction-selected)
+" Example: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
 
 " Remap keys for applying codeAction to the current buffer.
-nmap <Leader>ac  <Plug>(coc-codeaction)
+nmap <leader>ac  <Plug>(coc-codeaction)
 " Apply AutoFix to problem on the current line.
-nmap <Leader>qf  <Plug>(coc-fix-current)
+nmap <leader>qf  <Plug>(coc-fix-current)
 
 " Run the Code Lens action on the current line.
-nmap <Leader>cl  <Plug>(coc-codelens-action)
+nmap <leader>cl  <Plug>(coc-codelens-action)
 
 
 " **************************** nvim.dap ***************************************
 if has("nvim")
-  nnoremap <silent> <F5> <Cmd>lua require'dap'.continue()<CR>
-  nnoremap <silent> <F10> <Cmd>lua require'dap'.step_over()<CR>
-  nnoremap <silent> <F11> <Cmd>lua require'dap'.step_into()<CR>
-  nnoremap <silent> <F12> <Cmd>lua require'dap'.step_out()<CR>
-  nnoremap <silent> <Leader>b <Cmd>lua require'dap'.toggle_breakpoint()<CR>
-  nnoremap <silent> <Leader>B <Cmd>lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
-  nnoremap <silent> <Leader>lp <Cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>
-  nnoremap <silent> <Leader>dr <Cmd>lua require'dap'.repl.open()<CR>
-  nnoremap <silent> <Leader>dl <Cmd>lua require'dap'.run_last()<CR>
+  nnoremap <silent> <F5> <cmd>lua require'dap'.continue()<CR>
+  nnoremap <silent> <F10> <cmd>lua require'dap'.step_over()<CR>
+  nnoremap <silent> <F11> <cmd>lua require'dap'.step_into()<CR>
+  nnoremap <silent> <F12> <cmd>lua require'dap'.step_out()<CR>
+  nnoremap <silent> <leader>b <cmd>lua require'dap'.toggle_breakpoint()<CR>
+  nnoremap <silent> <leader>B <cmd>lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
+  nnoremap <silent> <leader>lp <cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>
+  nnoremap <silent> <leader>dr <cmd>lua require'dap'.repl.open()<CR>
+  nnoremap <silent> <leader>dl <cmd>lua require'dap'.run_last()<CR>
 endif
 
 " **************************** vimspector *************************************
@@ -173,20 +252,20 @@ endif
 " let g:vimspector_enable_mappings = 'HUMAN'
 
 " Breakpoints.
-nnoremap <Leader>dt :call vimspector#ToggleBreakpoint()<CR>
-nnoremap <Leader>dT :call vimspector#ClearBreakpoints()<CR>
+nnoremap <leader>dt :call vimspector#ToggleBreakpoint()<CR>
+nnoremap <leader>dT :call vimspector#ClearBreakpoints()<CR>
 
 " Initialization.
-nnoremap <Leader>dd :call vimspector#Launch()<CR>
-nnoremap <Leader>df :call vimspector#RunToCursor()<CR>
-nnoremap <Leader>de :call vimspector#Reset()<CR>
-nnoremap <Leader>dc :call vimspector#Continue()<CR>
+nnoremap <leader>dd :call vimspector#Launch()<CR>
+nnoremap <leader>df :call vimspector#RunToCursor()<CR>
+nnoremap <leader>de :call vimspector#Reset()<CR>
+nnoremap <leader>dc :call vimspector#Continue()<CR>
 
 " Navigation.
-nmap <Leader>dk <Plug>VimspectorRestart
-nmap <Leader>dh <Plug>VimspectorStepOut
-nmap <Leader>dl <Plug>VimspectorStepInto
-nmap <Leader>dj <Plug>VimspectorStepOver
+nmap <leader>dk <Plug>VimspectorRestart
+nmap <leader>dh <Plug>VimspectorStepOut
+nmap <leader>dl <Plug>VimspectorStepInto
+nmap <leader>dj <Plug>VimspectorStepOver
 
 
 " **************************** nerdtree ***************************************

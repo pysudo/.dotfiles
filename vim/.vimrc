@@ -1,59 +1,5 @@
-" ---------------------------- Plugin Manager ---------------------------------
-" Initialize plugin system
-call plug#begin()
-
-" Full language server protocol. (Also works for vim)
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-let g:coc_global_extensions = ["coc-sh"] " Install basic LSPs
-
-" Mappings to easily delete, change and add \"surroundings\" in pairs.
-Plug 'tpope/vim-surround'
-
-" A multi language graphical debugger for Vim.
-Plug 'puremourning/vimspector'
-
-" A dark Vim/Neovim color scheme.
-Plug 'morhetz/gruvbox'
-let g:gruvbox_contrast_dark = "hard"
-
-" Status/tabline for vim/nvim.
-Plug 'vim-airline/vim-airline'
-
-" A file system explorer.
-Plug 'scrooloose/nerdtree'
-
-" Enables NERDTree to open, delete, move, or copy multiple files at once.
-Plug 'PhilRunninger/nerdtree-visual-selection'
-
-" A plugin of NERDTree showing git status flags.
-Plug 'Xuyuanp/nerdtree-git-plugin'
-let g:NERDTreeGitStatusShowClean = 1
-
-" A snippets manager for vim.
-Plug 'SirVer/ultisnips'
-" If you want :UltiSnipsEdit to split your window.
-let g:UltiSnipsEditSplit="vertical"
-
-" Repository containing snippets files for various programming languages.
-Plug 'honza/vim-snippets'
-
-" Browse undo history and switch between different undo branches.
-Plug 'mbbill/undotree'
-
-" Vim plugin for Git.
-Plug 'tpope/vim-fugitive'
-
-" (Do)cumentation (Ge)nerator which will generate a proper documentation.
-" If post-update hook error, restart vim and ':call doge#install()' manually.
-Plug 'kkoomen/vim-doge', { 'do': { -> doge#install() } }
-
-if has("nvim")
-  " Debug Adapter Protocol client implementation for Neovim
-  Plug 'mfussenegger/nvim-dap'
-endif
-
-call plug#end()
-
+" Source plugins.
+source $HOME/.vim/Plugins.vim
 
 " ---------------------------- General ----------------------------------------
 set nocompatible
@@ -71,7 +17,7 @@ set wildmenu
 "set wildmode=list:longest
 set scrolloff=8
 
-colorscheme gruvbox
+autocmd vimenter * colorscheme gruvbox
 if (&background == "light")
   set bg=dark
 endif
@@ -101,7 +47,7 @@ set shiftwidth=2
 
 " Presist undo tree for every file when closed and reopened later.
 if has("persistent_undo")
-  let target_path = expand('~/.undodir')
+  let target_path = expand('~/.vim/.undodir')
 
   " create the directory and any parent directories
   " if the location does not exist.
@@ -169,13 +115,10 @@ endfunction
 if (IsWSL())
   " Copy (write) highlighted text to .vimbuffer
   vnoremap <leader>y y:new ~/.vimbuffer<CR>VGp:x<CR> \| :!cat ~/.vimbuffer \| clip.exe <CR><CR>
-  " Paste from buffer
-  nnoremap <leader>p :r ~/.vimbuffer<CR>
 else
   nnoremap <leader>y """*y"
   vnoremap <leader>y """*y"
   nnoremap <leader>Y """*Y"
-  nnoremap <leader>p """*p"
 endif
 
 " Don't retain deleted text in the numbered register.
@@ -193,6 +136,8 @@ nnoremap <leader>x <cmd>silent !chmod +x %<CR>
 
 
 " **************************** coc.nvim ***************************************
+let g:coc_global_extensions = ["coc-sh"] " Automatically install basic LSPs.
+
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
@@ -234,19 +179,6 @@ nmap <leader>qf  <Plug>(coc-fix-current)
 nmap <leader>cl  <Plug>(coc-codelens-action)
 
 
-" **************************** nvim.dap ***************************************
-if has("nvim")
-  nnoremap <silent> <F5> <cmd>lua require'dap'.continue()<CR>
-  nnoremap <silent> <F10> <cmd>lua require'dap'.step_over()<CR>
-  nnoremap <silent> <F11> <cmd>lua require'dap'.step_into()<CR>
-  nnoremap <silent> <F12> <cmd>lua require'dap'.step_out()<CR>
-  nnoremap <silent> <leader>b <cmd>lua require'dap'.toggle_breakpoint()<CR>
-  nnoremap <silent> <leader>B <cmd>lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
-  nnoremap <silent> <leader>lp <cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>
-  nnoremap <silent> <leader>dr <cmd>lua require'dap'.repl.open()<CR>
-  nnoremap <silent> <leader>dl <cmd>lua require'dap'.run_last()<CR>
-endif
-
 " **************************** vimspector *************************************
 " If set to 'HUMAN' disable the rest below as to not pollute the keyspace.
 " let g:vimspector_enable_mappings = 'HUMAN'
@@ -280,36 +212,3 @@ nnoremap <leader>u :UndotreeToggle<CR>
 " **************************** vim-fugitive ***********************************
 nnoremap <leader>gs :Git<CR>
 
-
-" ---------------------------- Config -----------------------------------------
-" **************************** nvim.dap ***************************************
-if has("nvim")
-lua <<EOF
-  local dap = require('dap')
-  dap.adapters.node = {
-    type = 'executable',
-    command = 'node',
-    -- Install vscode-node-debug2 on the specified path.
-    args = {os.getenv('HOME') .. '/dev/microsoft/vscode-node-debug2/out/src/nodeDebug.js'},
-  }
-  dap.configurations.javascript = {
-    {
-      name = 'Launch',
-      type = 'node',
-      request = 'launch',
-      program = '${file}',
-      cwd = vim.fn.getcwd(),
-      sourceMaps = true,
-      protocol = 'inspector',
-      console = 'integratedTerminal',
-    },
-    {
-      -- For this to work you need to make sure the node process is started with the `--inspect` flag.
-      name = 'Attach to process',
-      type = 'node',
-      request = 'attach',
-      processId = require'dap.utils'.pick_process,
-    },
-  }
-EOF
-endif

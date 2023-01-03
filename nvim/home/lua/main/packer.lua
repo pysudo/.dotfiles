@@ -27,16 +27,6 @@ return require('packer').startup(function(use)
   -- Status/tabline for vim/nvim.
   use "vim-airline/vim-airline"
 
-  -- A file system explorer.
-  use "scrooloose/nerdtree"
-
-  -- Enables NERDTree to open, delete, move, or copy multiple files at once.
-  use "PhilRunninger/nerdtree-visual-selection"
-
-  -- A plugin of NERDTree showing git status flags.
-  use "Xuyuanp/nerdtree-git-plugin"
-  vim.g.NERDTreeGitStatusShowClean = 1
-
   -- A snippets manager for vim.
   use "SirVer/ultisnips"
   -- If you want :UltiSnipsEdit to split your window.
@@ -54,6 +44,22 @@ return require('packer').startup(function(use)
   -- (Do)cumentation (Ge)nerator which will generate a proper documentation.
   use 'kkoomen/vim-doge'
 
-  -- Debug Adapter Protocol client implementation for Neovim
+  -- Debug Adapter Protocol client implementation for Neovim.
   use "mfussenegger/nvim-dap"
+
+  use {
+    -- Highly extendable fuzzy finder over lists.
+    "nvim-telescope/telescope.nvim", tag = "0.1.0",
+    -- or                            , branch = "0.1.x",
+    requires = { {"nvim-lua/plenary.nvim"} }
+  }
+
+  -- Quick switch to differnt files.
+  use("theprimeagen/harpoon")
+
+  -- Parser tool for efficient syntax tree for neovim.
+  use("nvim-treesitter/nvim-treesitter", {run = ":TSUpdate"})
+
+  -- Enhances netrw.
+  use("tpope/vim-vinegar")
 end)

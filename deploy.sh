@@ -101,15 +101,27 @@ sudo apt-get install -y curl
 echo -e "\n"
 echo -e "\e[7mInstalling Neovim...\e[0m"
 sudo apt-get install -y software-properties-common # add-apt-repository for configuring ppa
-if ! [[ -f /etc/apt/sources.list.d/neovim-ppa-ubuntu-stable-bionic.list ]]
+if ! [ "$(ls /etc/apt/sources.list.d/neovim-ppa-ubuntu-unstable-*.list 2> /dev/null | wc -l)" -eq "1" ]
 then
-  sudo add-apt-repository -y ppa:neovim-ppa/stable
-  sudo apt-get update
+  sudo add-apt-repository -y ppa:neovim-ppa/unstable
+  sudo apt-get update && sudo apt-get -y upgrade
 fi
 if ! [ -f /usr/bin/nvim ]
 then
   sudo apt-get -y install neovim
 fi
+
+
+# Download and install GNU compiler tools.
+echo -e "\n"
+echo -e "\e[7mInstalling GNU compiler tools...\e[0m"
+sudo apt-get install -y build-essential
+
+
+# Download and install gdb.
+echo -e "\n"
+echo -e "\e[7mInstalling GDB debugger...\e[0m"
+sudo apt-get install -y gdb
 
 
 # Plugin manager for vim.
@@ -281,6 +293,12 @@ fi
 cd $initDir
 
 
+# Download and install ripgrep for grep search in nvim-telescope plugin.
+echo -e "\n"
+echo -e "\e[7mInstalling ripgrep...\e[0m"
+sudo apt-get install -y ripgrep
+
+
 # User-defined aliases.
 echo -e "\n"
 userDefinedAliasesPath=$HOME/.bash_aliases
@@ -294,6 +312,7 @@ tmuxConfigPath=$HOME/.tmux.conf
 modifyPath $tmuxConfigPath \
   "ln -s $initDir/.tmux.conf $tmuxConfigPath" \
   "echo -e Created symlink \033[1;36m$initDir/.tmux -> $tmuxConfigPath\e[0m"
+
 
 echo -e "\n"
 echo -e "\e[34mRestart the terminal for changes to take effect.\e[0m"

@@ -3,22 +3,21 @@ call plug#begin()
 
 " Full language server protocol. (Also works for vim)
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-let g:coc_global_extensions = ["coc-sh"] " Install basic LSPs
+let g:coc_global_extensions = ["coc-sh", "coc-snippets"] " Install basic LSPs
 
 " Mappings to easily delete, change and add \"surroundings\" in pairs.
 Plug 'tpope/vim-surround'
 
-" A multi language graphical debugger for Vim. Plug 'puremourning/vimspector' A dark Vim/Neovim color scheme.
+" A multi language graphical debugger for Vim. 
+Plug 'puremourning/vimspector'
+
+" A dark Vim/Neovim color scheme.
 Plug 'morhetz/gruvbox'
 let g:gruvbox_contrast_dark = "hard"
 
 " Status/tabline for vim/nvim.
 Plug 'vim-airline/vim-airline'
 
-" A snippets manager for vim.
-Plug 'SirVer/ultisnips'
-" If you want :UltiSnipsEdit to split your window.
-let g:UltiSnipsEditSplit="vertical"
 
 " Repository containing snippets files for various programming languages.
 Plug 'honza/vim-snippets'

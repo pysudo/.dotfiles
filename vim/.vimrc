@@ -75,13 +75,6 @@ endif
 let g:coc_disable_startup_warning = 1
 
 
-" **************************** ultiSnips **************************************
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsListSnippets="<C-M-space>"
-let g:UltiSnipsJumpForwardTrigger="<C-b>"
-let g:UltiSnipsJumpBackwardTrigger="<C-z>"
-
-
 " ---------------------------- Mappings ---------------------------------------
 let mapleader = " "
 
@@ -135,6 +128,14 @@ nnoremap <leader>s :%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>
 nnoremap <leader>x <cmd>silent !chmod +x %<CR>
 
 
+" Navigate through buffers.
+nnoremap H :bp<CR>
+nnoremap L :bn<CR>
+
+" Quick switch between buffer.
+nnoremap <leader><tab> :e #<CR>
+
+
 " **************************** coc.nvim ***************************************
 let g:coc_global_extensions = ["coc-sh"] " Automatically install basic LSPs.
 
@@ -177,6 +178,22 @@ nmap <leader>qf  <Plug>(coc-fix-current)
 
 " Run the Code Lens action on the current line.
 nmap <leader>cl  <Plug>(coc-codelens-action)
+
+" Snippets
+" Trigger snippet expand.
+imap <C-l> <Plug>(coc-snippets-expand)
+
+" Select text for visual placeholder of snippet.
+vmap <C-j> <Plug>(coc-snippets-select)
+
+" Jump to next placeholder, it's default of coc.nvim
+let g:coc_snippet_next = '<C-j>'
+
+" Jump to previous placeholder, it's default of coc.nvim
+let g:coc_snippet_prev = '<C-k>'
+
+" Both expand and jump (make expand higher priority.)
+imap <C-j> <Plug>(coc-snippets-expand-jump)
 
 
 " **************************** vimspector *************************************

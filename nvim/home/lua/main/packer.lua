@@ -27,11 +27,6 @@ return require('packer').startup(function(use)
   -- Status/tabline for vim/nvim.
   use "vim-airline/vim-airline"
 
-  -- A snippets manager for vim.
-  use "SirVer/ultisnips"
-  -- If you want :UltiSnipsEdit to split your window.
-  vim.g.UltiSnipsEditSplit = "vertical"
-
   -- Repository containing snippets files for various programming languages.
   use "honza/vim-snippets"
 

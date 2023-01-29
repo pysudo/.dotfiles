@@ -5,7 +5,6 @@ source $HOME/.vim/Plugins.vim
 set nocompatible
 syntax on
 
-set termguicolors
 set noswapfile
 set nobackup
 set number
@@ -21,9 +20,8 @@ autocmd vimenter * colorscheme gruvbox
 if (&background == "light")
   set bg=dark
 endif
-
-hi Normal guibg=NONE ctermbg=NONE
-hi NormalFloat guibg=NONE ctermbg=NONE
+autocmd vimenter * hi Normal guibg=NONE ctermbg=NONE
+autocmd vimenter * hi NormalFloat guibg=NONE ctermbg=NONE
 
 set cursorcolumn
 hi CursorColumn cterm=NONE ctermbg=239

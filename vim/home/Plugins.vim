@@ -35,4 +35,7 @@ Plug 'kkoomen/vim-doge'
 " Enhances netrw.
 Plug 'tpope/vim-vinegar'
 
+" Switching between a single-line statement and a multi-line one.
+Plug 'AndrewRadev/splitjoin.vim'
+
 call plug#end()

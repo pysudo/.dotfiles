@@ -57,4 +57,7 @@ return require('packer').startup(function(use)
 
   -- Enhances netrw.
   use("tpope/vim-vinegar")
+
+  -- Switch between a single-line statement and a multi-line one.
+  use("AndrewRadev/splitjoin.vim")
 end)

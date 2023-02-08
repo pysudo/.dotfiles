@@ -48,3 +48,5 @@ vim.keymap.set("n", "L", ":bn<CR>")
 -- Quick switch between buffer.
 vim.keymap.set("n", "<leader><tab>", ":e #<CR>")
 
+-- Remove the highlighting of the last searched pattern.
+vim.keymap.set("n", "<leader>nh", ":noh<CR>")

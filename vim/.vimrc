@@ -1,6 +1,7 @@
 " Source plugins.
 source $HOME/.vim/Plugins.vim
 
+
 " ---------------------------- General ----------------------------------------
 set nocompatible
 syntax on
@@ -15,26 +16,11 @@ set hlsearch
 set wildmenu
 "set wildmode=list:longest
 set scrolloff=8
-
-autocmd vimenter * colorscheme gruvbox
-if (&background == "light")
-  set bg=dark
-endif
-autocmd vimenter * hi Normal guibg=NONE ctermbg=NONE
-autocmd vimenter * hi NormalFloat guibg=NONE ctermbg=NONE
-
+set signcolumn=yes
 set cursorcolumn
-hi CursorColumn cterm=NONE ctermbg=239
 set cursorline
-hi CursorLine cterm=NONE ctermbg=235
 set colorcolumn=80
-hi ColorColumn ctermbg=lightgrey guibg=lightgrey
-hi Conceal ctermbg=DarkBlue
 
-hi Pmenu ctermfg=Black ctermbg=238
-hi PmenuSel ctermfg=Grey ctermbg=Black
-hi PmenuSbar ctermbg=Black
-hi PmenuThumb ctermbg=DarkGrey
 
 set expandtab
 set smartcase
@@ -57,20 +43,17 @@ if has("persistent_undo")
   set undofile
 endif
 
-" Always show the signcolumn, otherwise it would shift the text each time
-" diagnostics appear/become resolved.
-if has("nvim-0.5.0") || has("patch-8.1.1564")
-  " Recently vim can merge signcolumn and number column into one
-  set signcolumn=number
-else
-  set signcolumn=yes
-endif
-
 
 " **************************** coc.nvim ***************************************
 " Remove comment to disable vim version recommendation warning for older
 " versions of ubuntu.
 let g:coc_disable_startup_warning = 1
+
+
+" **************************** vim-airline ************************************
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#left_alt_sep = "▶"
+let g:airline#extensions#tabline#formatter = "unique_tail"
 
 
 " ---------------------------- Mappings ---------------------------------------

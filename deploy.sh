@@ -124,19 +124,13 @@ echo -e "\e[7mInstalling GDB debugger...\e[0m"
 sudo apt-get install -y gdb
 
 
-# Plugin manager for vim.
-echo -e "\n"
-echo -e "\e[7mInstalling Plug (Plugin Manager) for vim...\e[0m"
-vimPlugPath=$HOME/.vim/autoload/plug.vim
-modifyPath $vimPlugPath \
-  "curl -fLo $vimPlugPath --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
-
 # Plugin manager for neovim.
 echo -e "\n"
 echo -e "\e[7mInstalling Packer (Plugin Manager) for neovim...\e[0m"
 nvimPackerRepoPath=$HOME/.local/share/nvim/site/pack/packer/start/packer.nvim
 modifyPath $nvimPackerRepoPath \
   "git clone --depth 1 https://github.com/wbthomason/packer.nvim $nvimPackerRepoPath"
+
 
 # Install nvm and Node
 echo -e "\n"
@@ -177,74 +171,15 @@ else
   echo -e "\e[31mnode could not be installed. Skipping vscode-node-debug2 installation.\e[0m"
 fi
 
+
 << TODO
   Instead for running post-update hooks for every 'VimEnter' event, execute it only once during deployment.
   Current workaround involves autocmds inside 'post-update-hook' files within the 'after' directory.
 TODO
-# Install plugins for vim via Plug (Plugin Manager).
-echo -e "\n"
-echo -e "\e[7mInstalling plugins for vim via plugin manager 'Plug'...\e[0m"
-vim -c "source $initDir/vim/home/Plugins.vim" -c "PlugInstall" -c "qa"
-
 # Install extensions for neovim using plugin manager.
 echo -e "\n"
 echo -e "\e[7mInstalling plugins for neovim via plugin manager 'Packer'...\e[0m"
 nvim -c "so $initDir/nvim/home/lua/main/packer.lua" -c "autocmd User PackerComplete quitall" -c "PackerSync"
-
-
-# Symbolic link configuration and plugins for vim.
-echo -e "\n"
-vimConfigPathSource=$initDir/vim/.vimrc
-vimConfigPath=$HOME/.vimrc
-vimHomePathSource=$initDir/vim/home
-vimHomePath=$HOME/.vim
-
-modifyPath $vimConfigPath \
-  "ln -s $vimConfigPathSource $vimConfigPath" \
-  "echo -e Created symlink \033[1;36m$vimHomePathSource/.vimrc -> $vimConfigPath\e[0m" \
-  "echo -e \e[33mcoc startup warning has been disabled. Ensure Vim or Neovim is using the right version for coc.nvim\e[0m"
-cd $initDir
-
-echo -e "\n"
-if [[ $(find -L "$vimHomePath" "$vimHomePathSource" -printf "%P\n" | sort | uniq -d | wc -w) -eq 0 ]]
-then
-  # Configuration does not exists.
-  cd $vimHomePath
-  ln -s $vimHomePathSource/* .
-  echo -e "Created symlink \033[1;36m$vimHomePathSource/* -> $vimHomePath\e[0m"
-else
-  # Configuration exists or is not in sync.
-  response=""
-  if [[ $forceOverwrite = "f" ]]
-  then
-    response="Y"
-  fi
-
-  if [[ $(find -L "$vimHomePath" "$vimHomePathSource" -printf "%P\n" | sort | uniq -d | wc -w) -eq $(find "$vimHomePathSource" -printf "%P\n" | wc -w) ]]
-  then
-    # Configuration exists.
-    while ! [[ $response =~ ^(Y|n|N)$ ]]
-    do
-      echo -e "\n$vimHomePath/* already exists. Do you wish to overwrite it? [Y/n]"
-      read response
-    done
-  else
-    # Configuration is not in sync.
-    while ! [[ $response =~ ^(Y|n|N)$ ]]
-    do
-      echo -e "\n$vimHomePath/* is not in sync with $vimHomePathSource/*. Do you wish to recreate it (recommended)? [Y/n]"
-      read response
-    done
-  fi
-  if [[ $response = "Y" ]]
-  then
-    find -L "$vimHomePathSource"  -maxdepth 1 -not -path "$vimHomePathSource" -printf $vimHomePath/ -printf '%P\n' | xargs rm -rf
-    cd $vimHomePath
-    ln -s $vimHomePathSource/* .
-    echo -e "Created symlink \033[1;36m$vimHomePathSource/* -> $vimHomePath\e[0m"
-  fi
-fi
-cd $initDir
 
 
 # Symbolic link configuration and plugins for neovim.
@@ -305,6 +240,7 @@ userDefinedAliasesPath=$HOME/.bash_aliases
 modifyPath $userDefinedAliasesPath \
   "ln -s $initDir/.bash_aliases $userDefinedAliasesPath" \
   "echo -e Created symlink \033[1;36m$initDir/.bash_aliases -> $userDefinedAliasesPath\e[0m"
+
 
 # tmux configuration
 echo -e "\n"

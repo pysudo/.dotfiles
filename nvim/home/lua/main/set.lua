@@ -14,6 +14,7 @@ vim.opt.wildmenu = true
 -- vim.opt.wildmode=list:longest = true
 vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
+vim.opt.updatetime= 50
 
 vim.opt.cursorcolumn = true
 vim.opt.cursorline = true

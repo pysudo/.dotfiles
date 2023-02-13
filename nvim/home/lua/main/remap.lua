@@ -15,6 +15,7 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 
+
 -- Copy text to system clipboard.
 local function isWSL()
   local output = vim.fn.systemlist "uname -r"
@@ -22,21 +23,35 @@ local function isWSL()
 end
 
 if (isWSL()) then
-  -- Copy (write) highlighted text to .vimbuffer
   vim.keymap.set("v", "<leader>y", "y:new ~/.vimbuffer<CR>VGp:x<CR> | :!cat ~/.vimbuffer | clip.exe <CR><CR>")
-else
-  vim.keymap.set({"n", "v"}, "<leader>y", [["+y]])
-  vim.keymap.set("n", "<leader>Y", [["+Y]])
+  vim.g.clipboard = {
+    name = 'WslClipboard',
+    copy = {
+      ['+'] = 'clip.exe',
+    },
+    paste = {
+      ['+'] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("r", ""))', ['*'] = 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("r", ""))',
+    },
+    cache_enabled = 0,
+  }
 end
+
+vim.keymap.set({"n", "v"}, "<leader>y", [["+y]])
+vim.keymap.set("n", "<leader>Y", [["+Y]])
+vim.keymap.set({"n", "v"}, "<leader>p", [["+p]])
+
 
 -- Don't retain deleted text in the numbered register.
 vim.keymap.set({"n", "v"}, "<leader>d", [["_d]])
 
 -- When overwritting, presist the copied text and remove the overwritten text.
-vim.keymap.set("x", "<leader>p", [["_dP]])
+vim.keymap.set("x", "<leader>P", [["_dP]])
 
 -- Search and replace the text under the cursor.
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+
+-- Search and replace the yanked text from the selected range.
+vim.keymap.set("v", "<leader>s", [[:exe "'<,'>s/" . @0 . "/" . input("Enter replacement string: ") . "/g"<Home><Del><Del><Del><Del><Del><CR>]])
 
 -- Make the current file an executable.
 vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
@@ -45,7 +60,6 @@ vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
 vim.keymap.set("n", "<leader>bb", ":enew<CR>")
 vim.keymap.set("n", "<leader>bv", ":vnew<CR>") -- Vertical
 vim.keymap.set("n", "<leader>bh", ":new<CR>") -- Horizontal
-
 -- Write buffer to current directory.
 vim.keymap.set("n", "<leader>bw", function ()
   local filename = vim.fn.input("Enter filename: ")
@@ -61,7 +75,7 @@ vim.keymap.set("n", "<leader>bd", function ()
 
       echohl ErrorMsg
       echomsg errorMessage
-      echohl None 
+      echohl None
     else
       :bdelete!
     endif
@@ -82,8 +96,8 @@ local function deleteBuffer()
       let errorMessage = errorMessage . " to close current buffer."
 
       echohl ErrorMsg
-      echomsg errorMessage 
-      echohl None 
+      echomsg errorMessage
+      echohl None
     ]]
 
     return
@@ -111,3 +125,12 @@ vim.keymap.set("n", "<leader><tab>", ":e #<CR>")
 
 -- Remove the highlighting of the last searched pattern.
 vim.keymap.set("n", "<leader>nh", ":noh<CR>")
+
+-- Remove trailing and leading whitespaces.
+function TrimTrails()
+  vim.cmd[[:%s/\s\+$//g]]
+end
+function TrimLeads()
+  vim.cmd[[:%s/^ *//g]]
+end
+

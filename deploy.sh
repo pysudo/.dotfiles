@@ -184,9 +184,9 @@ nvim -c "so $initDir/nvim/home/lua/main/packer.lua" -c "autocmd User PackerCompl
 
 # Symbolic link configuration and plugins for neovim.
 echo -e "\n"
-mkdir -p $HOME/.config/nvim
 neovimHomePath=$HOME/.config/nvim
 neovimHomePathSource=$initDir/nvim/home
+mkdir -p $neovimHomePath
 if [[ $(find -L "$neovimHomePath" "$neovimHomePathSource" -printf "%P\n" | sort | uniq -d | wc -w) -eq 0 ]]
 then
   # Configuration does not exists.
@@ -238,16 +238,32 @@ sudo apt-get install -y ripgrep
 echo -e "\n"
 userDefinedAliasesPath=$HOME/.bash_aliases
 modifyPath $userDefinedAliasesPath \
-  "ln -s $initDir/.bash_aliases $userDefinedAliasesPath" \
-  "echo -e Created symlink \033[1;36m$initDir/.bash_aliases -> $userDefinedAliasesPath\e[0m"
+  "ln -s $initDir/bash/bash_aliases $userDefinedAliasesPath" \
+  "echo -e Created symlink \033[1;36m$initDir/bash/bash_aliases -> $userDefinedAliasesPath\e[0m"
 
 
 # tmux configuration
-echo -e "\n"
 tmuxConfigPath=$HOME/.tmux.conf
 modifyPath $tmuxConfigPath \
-  "ln -s $initDir/.tmux.conf $tmuxConfigPath" \
-  "echo -e Created symlink \033[1;36m$initDir/.tmux -> $tmuxConfigPath\e[0m"
+  "ln -s $initDir/tmux/tmux.conf $tmuxConfigPath" \
+  "echo -e Created symlink \033[1;36m$initDir/tmux/tmux.conf -> $tmuxConfigPath\e[0m"
+
+
+# Deployment configuration for full blown linux distribution.
+if ! grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
+  # i3
+  echo -e "\n"
+  i3ParentDirPath=$HOME/.config
+  i3DirPath=$HOME/.config/i3
+  i3ConfigPathSource=$initDir/i3
+  mkdir -p $i3ParentDirPath
+  cd $i3ParentDirPath
+  modifyPath $i3DirPath \
+    "ln -s $i3ConfigPathSource ." \
+    "echo -e Created symlink \033[1;36m$i3ConfigPathSource -> $i3DirPath\e[0m"
+
+  cd $initDir
+fi
 
 
 echo -e "\n"

@@ -93,35 +93,45 @@ modifyPath() {
 }
 
 
-sudo apt-get update && sudo apt-get -y upgrade
-sudo apt-get install -y curl
+sudo apt update && sudo apt -y upgrade
+echo -e "\n"
+echo -e "\e[7mPre-installing additional dependencies...\e[0m"
+sudo apt install -y curl
+sudo apt install -y python3
+sudo apt install -y python3-pip
+python3 -m pip install --user --upgrade pynvim # Neovim
+sudo apt install -y ripgrep # nvim-telescope
+if ! grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
+  sudo apt install i3
+  sudo apt install xclip
+fi
 
 
 # Download and install neovim.
 echo -e "\n"
 echo -e "\e[7mInstalling Neovim...\e[0m"
-sudo apt-get install -y software-properties-common # add-apt-repository for configuring ppa
+sudo apt install -y software-properties-common # add-apt-repository for configuring ppa
 if ! [ "$(ls /etc/apt/sources.list.d/neovim-ppa-ubuntu-unstable-*.list 2> /dev/null | wc -l)" -eq "1" ]
 then
   sudo add-apt-repository -y ppa:neovim-ppa/unstable
-  sudo apt-get update && sudo apt-get -y upgrade
+  sudo apt update && sudo apt -y upgrade
 fi
 if ! [ -f /usr/bin/nvim ]
 then
-  sudo apt-get -y install neovim
+  sudo apt -y install neovim
 fi
 
 
 # Download and install GNU compiler tools.
 echo -e "\n"
 echo -e "\e[7mInstalling GNU compiler tools...\e[0m"
-sudo apt-get install -y build-essential
+sudo apt install -y build-essential
 
 
 # Download and install gdb.
 echo -e "\n"
 echo -e "\e[7mInstalling GDB debugger...\e[0m"
-sudo apt-get install -y gdb
+sudo apt install -y gdb
 
 
 # Plugin manager for neovim.
@@ -177,8 +187,6 @@ fi
   Current workaround involves autocmds inside 'post-update-hook' files within the 'after' directory.
 TODO
 # Install extensions for neovim using plugin manager.
-echo -e "\n"
-echo -e "\e[7mInstalling plugins for neovim via plugin manager 'Packer'...\e[0m"
 nvim -c "so $initDir/nvim/home/lua/main/packer.lua" -c "autocmd User PackerComplete quitall" -c "PackerSync"
 
 
@@ -228,28 +236,6 @@ fi
 cd $initDir
 
 
-# Download and install ripgrep for grep search in nvim-telescope plugin.
-echo -e "\n"
-echo -e "\e[7mInstalling ripgrep...\e[0m"
-sudo apt-get install -y ripgrep
-
-
-# User-defined aliases.
-echo -e "\n"
-userDefinedAliasesPath=$HOME/.bash_aliases
-modifyPath $userDefinedAliasesPath \
-  "ln -s $initDir/bash/bash_aliases $userDefinedAliasesPath" \
-  "echo -e Created symlink \033[1;36m$initDir/bash/bash_aliases -> $userDefinedAliasesPath\e[0m"
-
-
-# tmux configuration
-tmuxConfigPath=$HOME/.tmux.conf
-modifyPath $tmuxConfigPath \
-  "ln -s $initDir/tmux/tmux.conf $tmuxConfigPath" \
-  "echo -e Created symlink \033[1;36m$initDir/tmux/tmux.conf -> $tmuxConfigPath\e[0m"
-
-
-# Deployment configuration for full blown linux distribution.
 if ! grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
   # i3
   echo -e "\n"
@@ -264,6 +250,22 @@ if ! grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
 
   cd $initDir
 fi
+
+
+# User-defined aliases.
+echo -e "\n"
+userDefinedAliasesPath=$HOME/.bash_aliases
+modifyPath $userDefinedAliasesPath \
+  "ln -s $initDir/bash/bash_aliases $userDefinedAliasesPath" \
+  "echo -e Created symlink \033[1;36m$initDir/bash/bash_aliases -> $userDefinedAliasesPath\e[0m"
+
+
+# tmux configuration
+echo -e "\n"
+tmuxConfigPath=$HOME/.tmux.conf
+modifyPath $tmuxConfigPath \
+  "ln -s $initDir/tmux/tmux.conf $tmuxConfigPath" \
+  "echo -e Created symlink \033[1;36m$initDir/tmux/tmux.conf -> $tmuxConfigPath\e[0m"
 
 
 echo -e "\n"

@@ -100,6 +100,7 @@ sudo apt install -y curl
 sudo apt install -y python3
 sudo apt install -y python3-pip
 python3 -m pip install --user --upgrade pynvim # Neovim
+sudo apt install -y tmux
 sudo apt install -y ripgrep # nvim-telescope
 if ! grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
   sudo apt install i3
@@ -250,6 +251,14 @@ if ! grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
 
   cd $initDir
 fi
+
+
+# User-defined bash config.
+echo -e "\n"
+userDefinedAliasesPath=$HOME/.profile
+modifyPath $userDefinedAliasesPath \
+  "ln -s $initDir/bash/profile $userDefinedAliasesPath" \
+  "echo -e Created symlink \033[1;36m$initDir/bash/profile -> $userDefinedAliasesPath\e[0m"
 
 
 # User-defined aliases.

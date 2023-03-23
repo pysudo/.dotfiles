@@ -59,4 +59,7 @@ return require('packer').startup(function(use)
 
   -- Switch between a single-line statement and a multi-line one.
   use("AndrewRadev/splitjoin.vim")
+
+  -- Indentation guides to all lines (including empty lines).
+  use "lukas-reineke/indent-blankline.nvim"
 end)

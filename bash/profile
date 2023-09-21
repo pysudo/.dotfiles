@@ -31,3 +31,6 @@ if [[ $DESKTOP_SESSION = "i3" ]]
 then
   xrandr --output Virtual1 --mode 1920x1080
 fi
+
+# vi mode.
+set -o vi

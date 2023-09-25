@@ -1,0 +1,5 @@
+# vi mode.
+set -o vi
+
+# Bind Ctrl+L (form-feed) with "clear" command.
+bind -x '"\f"':clear

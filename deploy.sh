@@ -276,6 +276,21 @@ modifyPath $tmuxConfigPath \
   "ln -s $initDir/tmux/tmux.conf $tmuxConfigPath" \
   "echo -e Created symlink \033[1;36m$initDir/tmux/tmux.conf -> $tmuxConfigPath\e[0m"
 
+# Seperate custom bash configs.
+echo -e "\n"
+bashConfigPath=$HOME/.bash_custom_config
+modifyPath $bashConfigPath \
+  "ln -s $initDir/bash/bash_custom_config $bashConfigPath" \
+  "echo -e Created symlink \033[1;36m$initDir/bash/bash_custom_config -> $bashConfigPath\e[0m"
+
+if [ -f "$HOME/.bashrc" ]; then\
+  echo -e "\nif [ -f \"$HOME/.bash_custom_config\" ]; then" >> $HOME/.bashrc
+  echo -e "\x20\x20source $HOME/.bash_custom_config" >> $HOME/.bashrc
+  echo "fi" >> $HOME/.bashrc
+fi
+sudo chgrp root $HOME/.bash_custom_config
+chmod u+x $HOME/.bash_custom_config
+
 
 echo -e "\n"
 echo -e "\e[34mRestart the terminal for changes to take effect.\e[0m"

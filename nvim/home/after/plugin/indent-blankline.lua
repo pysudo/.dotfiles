@@ -1,13 +1,22 @@
+local hooks = require "ibl.hooks"
+-- create the highlight groups in the highlight setup hook, so they are reset
+-- every time the colorscheme changes
+hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
+  vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#C678DD" })
+end)
+
+require("ibl").setup {
+  whitespace = {
+    remove_blankline_trail = false,
+  },
+  scope = {
+    show_start = false,
+    show_end = false,
+    highlight = "RainbowViolet"
+  },
+}
+
 vim.opt.list = true
 vim.opt.listchars:append "space:⋅"
 vim.opt.listchars:append "eol:↴"
-
-require("indent_blankline").setup {
-  indent_blankline_space_char = ".",
-  indent_blankline_space_char_blankline = " ",
-
-  show_current_context = true,
-  show_current_context_start = false,
-  show_trailing_blankline_indent = false
-}
 

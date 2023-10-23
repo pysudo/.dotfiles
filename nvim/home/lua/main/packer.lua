@@ -44,7 +44,7 @@ return require('packer').startup(function(use)
 
   use {
     -- Highly extendable fuzzy finder over lists.
-    "nvim-telescope/telescope.nvim", tag = "0.1.1",
+    "nvim-telescope/telescope.nvim", tag = "0.1.4",
     requires = { {"nvim-lua/plenary.nvim"} }
   }
 

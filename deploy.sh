@@ -102,6 +102,7 @@ sudo apt install -y python3-pip
 python3 -m pip install --user --upgrade pynvim # Neovim
 sudo apt install -y tmux
 sudo apt install -y ripgrep # nvim-telescope
+sudo apt install -y luarocks 
 if ! grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
   sudo apt install i3
   sudo apt install xclip
@@ -166,20 +167,20 @@ then
   nvm use node # Switch to default node version.
   
   # Javascript debug adapter and configuration for nvim-dap
+  echo -e "\e[7mInstalling and configuring Javascript/Typescript debug adapter...\e[0m"
   echo -e "\n"
-  echo -e "\e[7mInstalling and configuring Javascript debug adapter for nvim-dap...\e[0m"
+  debuggerReleaseVersion=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/microsoft/vscode-js-debug/releases/latest | awk -F "/" '{print $NF}')
+  debuggerTarFile="js-debug-dap-$debuggerReleaseVersion.tar.gz"
+  debuggerFileName="js-debug"
   cd $HOME && mkdir -p ./dev/microsoft && cd ./dev/microsoft
-  modifyPath "$PWD/vscode-node-debug2" \
-    "git clone https://github.com/microsoft/vscode-node-debug2.git" \
-    "cd vscode-node-debug2" \
-    "npm install"
-  if [[ $? -eq 0 ]] # Build only if path is modified or newly created.
-  then
-    NODE_OPTIONS=--no-experimental-fetch npm run build
-  fi
+  modifyPath "$PWD/$debuggerFileName" \
+    "wget https://github.com/microsoft/vscode-js-debug/releases/download/$debuggerReleaseVersion/$debuggerTarFile" \
+    "tar -xzf $debuggerTarFile" \
+    "rm -rf $debuggerTarFile" \
+    "sudo luarocks install dkjson" # To parse package.json file.
 else
   echo -e "\e[31mnvm could not be found. Skipping node installation.\e[0m"
-  echo -e "\e[31mnode could not be installed. Skipping vscode-node-debug2 installation.\e[0m"
+  echo -e "\e[31mnode could not be installed. Skipping vscode-js-debug installation.\e[0m"
 fi
 
 

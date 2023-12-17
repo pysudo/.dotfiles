@@ -123,6 +123,12 @@ vim.keymap.set("n", "L", ":bn<CR>")
 -- Quick switch between buffer.
 vim.keymap.set("n", "<leader><tab>", ":e #<CR>")
 
+-- Executes :BufOnly but also removes all unloaded buffers from tabline.
+vim.keymap.set("n", "<leader>bq", function ()
+  vim.api.nvim_command("BufOnly")
+  vim.api.nvim_command("bn")
+end)
+
 -- Remove the highlighting of the last searched pattern.
 vim.keymap.set("n", "<leader>nh", ":noh<CR>")
 

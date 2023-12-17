@@ -1,38 +1,111 @@
 -- Config
-local dap = require('dap')
-dap.adapters.node = {
-  type = 'executable',
-  command = 'node',
-  -- Install vscode-node-debug2 on the specified path.
-  args = {os.getenv('HOME') .. '/dev/microsoft/vscode-node-debug2/out/src/nodeDebug.js'},
-}
-dap.configurations.javascript = {
-  {
-    name = 'Launch',
-    type = 'node',
-    request = 'launch',
-    program = '${file}',
-    cwd = vim.fn.getcwd(),
-    sourceMaps = true,
-    protocol = 'inspector',
-    console = 'integratedTerminal',
-  },
-  {
-    -- For this to work you need to make sure the node process is started with the `--inspect` flag.
-    name = 'Attach to process',
-    type = 'node',
-    request = 'attach',
-    processId = require'dap.utils'.pick_process,
-  },
+local dap = require("dap")
+
+require("dap").adapters["pwa-node"] = {
+  type = "server",
+  host = "localhost",
+  port = "${port}",
+  executable = {
+    command = "node",
+    -- ≡ƒÆÇ Make sure to update this path to point to your installation
+    args = { os.getenv('HOME') .. '/dev/microsoft/js-debug/src/dapDebugServer.js', "${port}" },
+  }
 }
 
+
+for _, language in ipairs({ "typescript", "javascript" }) do
+  dap.configurations[language] = {
+    {
+      type = 'pwa-node',
+      request = 'launch',
+      name = 'Launch Current File (pwa-node)',
+      cwd = "${workspaceFolder}", -- vim.fn.getcwd(),
+      args = { '${file}' },
+      sourceMaps = true,
+      protocol = 'inspector',
+    },
+    {
+      type = 'pwa-node',
+      request = 'launch',
+      name = 'Launch Current File (Typescript)',
+      cwd = "${workspaceFolder}",
+      runtimeArgs = { '--loader=ts-node/esm' },
+      program = function()
+        local debug_current_file = vim.fn.input({
+          prompt = "Wish to debug current file? Otherwise proceed debug main file from the project folder. (y/n): ",
+          default = "y",
+        })
+
+        if debug_current_file == "y" then
+          return "${file}"
+        end
+
+
+        local json = require('dkjson')
+        local package_file = io.open(os.getenv("PWD") .. '/package.json', "r")
+
+        if not package_file then
+          print("\n")
+          error("\npackage.json does not exists or verify your current working directory is your project folder.")
+        end
+
+        local content = package_file:read "*a"
+        package_file:close()
+        local package_json = json.decode(content)
+
+        local debug_file = os.getenv("PWD") .. "/" .. package_json["main"]
+        if io.open(debug_file, "r") then
+          return "${workspaceFolder}/" .. package_json["main"]
+        end
+
+        print("\n")
+        error("The main file of package.json does not exist.")
+      end,
+      runtimeExecutable = 'node',
+      sourceMaps = true,
+      protocol = 'inspector',
+      outFiles = { "${workspaceFolder}/**/**/*", "!**/node_modules/**" },
+      skipFiles = { '<node_internals>/**', 'node_modules/**' },
+      resolveSourceMapLocations = {
+        "${workspaceFolder}/**",
+        "!**/node_modules/**",
+      },
+      env = function()
+        local node_env = vim.fn.input({
+          prompt = "Enter the node environment you wish to debug in: ",
+          default = "dev"
+        })
+        return { NODE_ENV = node_env }
+      end
+    },
+  }
+end
+
+
+local dapui = require("dapui")
+require("dapui").setup()
+
+dap.listeners.after.event_initialized["dapui_config"] = function()
+  dapui.open()
+end
+dap.listeners.before.event_terminated["dapui_config"] = function()
+  dapui.close()
+end
+dap.listeners.before.event_exited["dapui_config"] = function()
+  dapui.close()
+end
+
+
 -- Remaps
-vim.keymap.set("n", "<f5>", "<cmd>lua require'dap'.continue()<CR>",  { silent = true }) 
-vim.keymap.set("n", "<f10>", "<cmd>lua require'dap'.step_over()<CR>",  { silent = true }) 
-vim.keymap.set("n", "<f11>", "<cmd>lua require'dap'.step_into()<CR>",  { silent = true }) 
-vim.keymap.set("n", "<f12>", "<cmd>lua require'dap'.step_out()<CR>",  { silent = true }) 
-vim.keymap.set("n", "<leader>b", "<cmd>lua require'dap'.toggle_breakpoint()<CR>",  { silent = true }) 
-vim.keymap.set("n", "<leader>B", "<cmd>lua require'dap'.set_breakpoint(vim.fn.input('breakpoint condition: '))<CR>",  { silent = true }) 
-vim.keymap.set("n", "<leader>lp", "<cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('log point message: '))<CR>",  { silent = true }) 
-vim.keymap.set("n", "<leader>dr", "<cmd>lua require'dap'.repl.open()<CR>",  { silent = true }) 
-vim.keymap.set("n", "<leader>dl", "<cmd>lua require'dap'.run_last()<CR>",  { silent = true })
+vim.keymap.set("n", "<leader>dd", "<cmd>lua require'dap'.continue()<CR>", { silent = true })
+vim.keymap.set("n", "<leader>dc", "<cmd>lua require'dap'.run_to_cursor()<CR>", { silent = true })
+vim.keymap.set("n", "<leader>dk", "<cmd>lua require'dap'.terminate()<CR>", { silent = true })
+vim.keymap.set("n", "<leader>dj", "<cmd>lua require'dap'.step_over()<CR>", { silent = true })
+vim.keymap.set("n", "<leader>dl", "<cmd>lua require'dap'.step_into()<CR>", { silent = true })
+vim.keymap.set("n", "<leader>dh", "<cmd>lua require'dap'.step_out()<CR>", { silent = true })
+vim.keymap.set("n", "<leader>b", "<cmd>lua require'dap'.toggle_breakpoint()<CR>", { silent = true })
+vim.keymap.set("n", "<leader>ba!", "<cmd>lua require'dap'.toggle_breakpoint()<CR>", { silent = true })
+vim.keymap.set("n", "<leader>B", "<cmd>lua require'dap'.set_breakpoint(vim.fn.input('breakpoint condition: '))<CR>", { silent = true })
+vim.keymap.set("n", "<leader>lp", "<cmd>lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('log point message: '))<CR>", { silent = true })
+vim.keymap.set("n", "<leader>dr", "<cmd>lua require'dap'.repl.open()<CR>", { silent = true })
+

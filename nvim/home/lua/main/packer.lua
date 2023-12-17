@@ -17,9 +17,6 @@ return require('packer').startup(function(use)
   -- Mappings to easily delete, change and add \"surroundings\-- in pairs.
   use "tpope/vim-surround"
 
-  -- A multi language graphical debugger for Vim.
-  use "puremourning/vimspector"
-
   -- A dark Vim/Neovim color scheme.
   use "morhetz/gruvbox"
   vim.g.gruvbox_contrast_dark = "hard"
@@ -39,8 +36,8 @@ return require('packer').startup(function(use)
   -- (Do)cumentation (Ge)nerator which will generate a proper documentation.
   use 'kkoomen/vim-doge'
 
-  -- Debug Adapter Protocol client implementation for Neovim.
-  use "mfussenegger/nvim-dap"
+  -- Debug Adapter Protocol client implementation for Neovim and UI.
+  use { "rcarriga/nvim-dap-ui", requires = {"mfussenegger/nvim-dap"} }
 
   use {
     -- Highly extendable fuzzy finder over lists.
@@ -62,4 +59,7 @@ return require('packer').startup(function(use)
 
   -- Indentation guides to all lines (including empty lines).
   use "lukas-reineke/indent-blankline.nvim"
+
+  -- Delete all the buffers except the current/named buffer.
+  use "vim-scripts/BufOnly.vim"
 end)

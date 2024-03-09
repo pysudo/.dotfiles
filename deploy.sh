@@ -1,5 +1,11 @@
 #!/bin/sh
 
+if [ $(uname -s) == "Darwin" ] # TODO: check if mac OS.
+then
+  pkgMgr="brew install"
+else
+  pkgMgr="sudo apt install -y"
+fi
 
 getopts ":f" forceOverwrite
 initDir=$(pwd)
@@ -72,7 +78,11 @@ modifyPath() {
   local path=$1
   shift
   
-  if ! checkPath $path; then executeCommandList "$@"; return 0; fi
+  if ! checkPath $path
+  then
+    executeCommandList "$@"
+    return 0
+  fi
   
   queryOverwrite $path
   local response=$?
@@ -93,52 +103,54 @@ modifyPath() {
 }
 
 
-sudo apt update && sudo apt -y upgrade
+if [ $(uname -s) == "Darwin" ]
+then
+  brew update && brew upgrade
+  eval $pkgMgr "findutils"
+  find() { # Alias 'find' to 'gfind' for this script.
+    gfind $@
+  }
+
+
+else
+  sudo apt update && sudo apt -y upgrade
+fi
 echo -e "\n"
-echo -e "\e[7mPre-installing additional dependencies...\e[0m"
-sudo apt install -y curl
-sudo apt install -y python3
-sudo apt install -y python3-pip
+echo -e "\x1B[7mPre-installing additional dependencies...\x1B[0m"
+eval $pkgMgr "curl"
+eval $pkgMgr "python3"
+eval $pkgMgr "python3-pip"
 python3 -m pip install --user --upgrade pynvim # Neovim
-sudo apt install -y tmux
-sudo apt install -y ripgrep # nvim-telescope
-sudo apt install -y luarocks 
-if ! grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
+eval $pkgMgr "tmux"
+eval $pkgMgr "ripgrep" # For nvim-telescope
+eval $pkgMgr "luarocks"
+if ! uname -a | grep -qEi "(Microsoft|WSL|Darwin)"
+then
   sudo apt install i3
-  sudo apt install xclip
 fi
 
 
 # Download and install neovim.
 echo -e "\n"
-echo -e "\e[7mInstalling Neovim...\e[0m"
-sudo apt install -y software-properties-common # add-apt-repository for configuring ppa
-if ! [ "$(ls /etc/apt/sources.list.d/neovim-ppa-ubuntu-unstable-*.list 2> /dev/null | wc -l)" -eq "1" ]
+echo -e "\x1B[7mInstalling Neovim...\x1B[0m"
+if [ $(uname -s) == "Linux" ]
 then
-  sudo add-apt-repository -y ppa:neovim-ppa/unstable
-  sudo apt update && sudo apt -y upgrade
+  sudo apt install -y software-properties-common # add-apt-repository for configuring ppa
+  if ! [ "$(ls /etc/apt/sources.list.d/neovim-ppa-ubuntu-unstable-*.list 2> /dev/null | wc -l)" -eq "1" ]; then
+    sudo add-apt-repository -y ppa:neovim-ppa/unstable
+    sudo apt update && sudo apt -y upgrade
+  fi
 fi
+
 if ! [ -f /usr/bin/nvim ]
 then
-  sudo apt -y install neovim
+  eval $pkgMgr "neovim"
 fi
-
-
-# Download and install GNU compiler tools.
-echo -e "\n"
-echo -e "\e[7mInstalling GNU compiler tools...\e[0m"
-sudo apt install -y build-essential
-
-
-# Download and install gdb.
-echo -e "\n"
-echo -e "\e[7mInstalling GDB debugger...\e[0m"
-sudo apt install -y gdb
 
 
 # Plugin manager for neovim.
 echo -e "\n"
-echo -e "\e[7mInstalling Packer (Plugin Manager) for neovim...\e[0m"
+echo -e "\x1B[7mInstalling Packer (Plugin Manager) for neovim...\x1B[0m"
 nvimPackerRepoPath=$HOME/.local/share/nvim/site/pack/packer/start/packer.nvim
 modifyPath $nvimPackerRepoPath \
   "git clone --depth 1 https://github.com/wbthomason/packer.nvim $nvimPackerRepoPath"
@@ -146,14 +158,17 @@ modifyPath $nvimPackerRepoPath \
 
 # Install nvm and Node
 echo -e "\n"
-echo -e "\e[7mInstalling nvm...\e[0m"
+echo -e "\x1B[7mInstalling nvm...\x1B[0m"
 nvmVersion=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/nvm-sh/nvm/releases/latest | awk -F "/" '{print $NF}')
 nvmPath=$HOME/.nvm
 modifyPath $nvmPath
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$nvmVersion/install.sh | bash
 
-source $HOME/.bashrc
-source $HOME/.profile
+if [ $(uname -s) == "Darwin" ]; then
+  source $HOME/.bash_profile
+else
+  source $HOME/.profile
+fi
 if [[ -d $HOME/.nvm && -f $HOME/.nvm/nvm.sh ]]
 then
   source $HOME/.nvm/nvm.sh
@@ -162,12 +177,12 @@ fi
 if command -v nvm
 then
   echo -e "\n"
-  echo -e "\e[7mInstalling node...\e[0m"
+  echo -e "\x1B[7mInstalling node...\x1B[0m"
   nvm install --lts
   nvm use node # Switch to default node version.
   
   # Javascript debug adapter and configuration for nvim-dap
-  echo -e "\e[7mInstalling and configuring Javascript/Typescript debug adapter...\e[0m"
+  echo -e "\x1B[7mInstalling and configuring Javascript/Typescript debug adapter...\x1B[0m"
   echo -e "\n"
   debuggerReleaseVersion=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/microsoft/vscode-js-debug/releases/latest | awk -F "/" '{print $NF}')
   debuggerTarFile="js-debug-dap-$debuggerReleaseVersion.tar.gz"
@@ -177,10 +192,10 @@ then
     "wget https://github.com/microsoft/vscode-js-debug/releases/download/$debuggerReleaseVersion/$debuggerTarFile" \
     "tar -xzf $debuggerTarFile" \
     "rm -rf $debuggerTarFile" \
-    "sudo luarocks install dkjson" # To parse package.json file.
+    "luarocks install --local dkjson" # To parse package.json file.
 else
-  echo -e "\e[31mnvm could not be found. Skipping node installation.\e[0m"
-  echo -e "\e[31mnode could not be installed. Skipping vscode-js-debug installation.\e[0m"
+  echo -e "\x1B[31mnvm could not be found. Skipping node installation.\x1B[0m"
+  echo -e "\x1B[31mnode could not be installed. Skipping vscode-js-debug installation.\x1B[0m"
 fi
 
 
@@ -202,7 +217,7 @@ then
   # Configuration does not exists.
   cd $neovimHomePath
   ln -s $neovimHomePathSource/* .
-  echo -e "Created symlink \033[1;36m$neovimHomePathSource/* -> $neovimHomePath\e[0m"
+  echo -e "Created symlink \x1B[1;36m$neovimHomePathSource/* -> $neovimHomePath\x1B[0m"
 else
   # Configuration exists or is not in sync.
   response=""
@@ -232,13 +247,14 @@ else
     find -L "$neovimHomePathSource" -maxdepth 1 -not -path "$neovimHomePathSource" -printf $neovimHomePath/ -printf '%P\n' | xargs rm -rf
     cd $neovimHomePath
     ln -s $neovimHomePathSource/* .
-    echo -e "Created symlink \033[1;36m$neovimHomePathSource/* -> $neovimHomePath\e[0m"
+    echo -e "Created symlink \x1B[1;36m$neovimHomePathSource/* -> $neovimHomePath\x1B[0m"
   fi
 fi
 cd $initDir
 
 
-if ! grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
+if ! uname -a | grep -qEi "(Microsoft|WSL|Darwin)"
+then
   # i3
   echo -e "\n"
   i3ParentDirPath=$HOME/.config
@@ -248,26 +264,10 @@ if ! grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
   cd $i3ParentDirPath
   modifyPath $i3DirPath \
     "ln -s $i3ConfigPathSource ." \
-    "echo -e Created symlink \033[1;36m$i3ConfigPathSource -> $i3DirPath\e[0m"
+    "echo -e Created symlink \x1B[1;36m$i3ConfigPathSource -> $i3DirPath\x1B[0m"
 
   cd $initDir
 fi
-
-
-# User-defined bash config.
-echo -e "\n"
-userDefinedAliasesPath=$HOME/.profile
-modifyPath $userDefinedAliasesPath \
-  "ln -s $initDir/bash/profile $userDefinedAliasesPath" \
-  "echo -e Created symlink \033[1;36m$initDir/bash/profile -> $userDefinedAliasesPath\e[0m"
-
-
-# User-defined aliases.
-echo -e "\n"
-userDefinedAliasesPath=$HOME/.bash_aliases
-modifyPath $userDefinedAliasesPath \
-  "ln -s $initDir/bash/bash_aliases $userDefinedAliasesPath" \
-  "echo -e Created symlink \033[1;36m$initDir/bash/bash_aliases -> $userDefinedAliasesPath\e[0m"
 
 
 # tmux configuration
@@ -275,24 +275,29 @@ echo -e "\n"
 tmuxConfigPath=$HOME/.tmux.conf
 modifyPath $tmuxConfigPath \
   "ln -s $initDir/tmux/tmux.conf $tmuxConfigPath" \
-  "echo -e Created symlink \033[1;36m$initDir/tmux/tmux.conf -> $tmuxConfigPath\e[0m"
+  "echo -e Created symlink \x1B[1;36m$initDir/tmux/tmux.conf -> $tmuxConfigPath\x1B[0m"
 
 # Seperate custom bash configs.
 echo -e "\n"
-bashConfigPath=$HOME/.bash_custom_config
+bashConfigPath=$HOME/.bashrc_local
 modifyPath $bashConfigPath \
-  "ln -s $initDir/bash/bash_custom_config $bashConfigPath" \
-  "echo -e Created symlink \033[1;36m$initDir/bash/bash_custom_config -> $bashConfigPath\e[0m"
+  "ln -s $initDir/bash/bashrc_local $bashConfigPath" \
+  "echo -e Created symlink \x1B[1;36m$initDir/bash/bashrc_local -> $bashConfigPath\x1B[0m"
 
-if [ -f "$HOME/.bashrc" ]; then\
-  echo -e "\nif [ -f \"$HOME/.bash_custom_config\" ]; then" >> $HOME/.bashrc
-  echo -e "\x20\x20source $HOME/.bash_custom_config" >> $HOME/.bashrc
-  echo "fi" >> $HOME/.bashrc
+if [ $(uname -s) == "Darwin" ]
+then
+  profileName=".bash_profile"
+else
+  profileName=".profile"
 fi
-sudo chgrp root $HOME/.bash_custom_config
-chmod u+x $HOME/.bash_custom_config
+if [ -f "$HOME/$profileName" ]; then\
+  echo -e "\nif [ -f \"$HOME/.bashrc_local\" ]; then" >> $HOME/$profileName
+  echo -e "\x20\x20source $HOME/.bashrc_local" >> $HOME/$profileName
+  echo "fi" >> $HOME/$profileName
+fi
+chmod u+x $HOME/.bashrc_local
 
 
 echo -e "\n"
-echo -e "\e[34mRestart the terminal for changes to take effect.\e[0m"
+echo -e "\x1B[34mRestart the terminal for changes to take effect.\x1B[0m"
 

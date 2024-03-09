@@ -1,0 +1,23 @@
+# Aliases
+alias vi="nvim"
+alias vim="nvim"
+alias tmux='tmux -u'
+
+
+# vi mode.
+set -o vi
+
+# Bind Ctrl+L (form-feed) with "clear" command.
+bind -x '"\f"':clear
+
+# Open current location with windows native explorer.
+if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
+  alias open='explorer.exe'
+fi
+
+# Switch to correct resolution for i3 running on a virtual machine.
+if [[ $DESKTOP_SESSION = "i3" ]]
+then
+  xrandr --output Virtual1 --mode 1920x1080
+fi
+

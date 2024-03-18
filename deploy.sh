@@ -126,7 +126,8 @@ eval $pkgMgr "ripgrep" # For nvim-telescope
 eval $pkgMgr "luarocks"
 if ! uname -a | grep -qEi "(Microsoft|WSL|Darwin)"
 then
-  sudo apt install i3
+  sudo apt install i3 -y
+  sudo apt install xclip -y
 fi
 
 

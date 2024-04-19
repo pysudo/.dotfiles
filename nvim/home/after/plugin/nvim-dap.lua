@@ -29,7 +29,8 @@ for _, language in ipairs({ "typescript", "javascript" }) do
       request = 'launch',
       name = 'Launch Current File (Typescript)',
       cwd = "${workspaceFolder}",
-      runtimeArgs = { '--loader=ts-node/esm' },
+      resolveSourceMapLocations = { "!**/node_modules/**" },
+      runtimeArgs = { "-r", "ts-node/register" },
       program = function()
         local debug_current_file = vim.fn.input({
           prompt = "Wish to debug current file? Otherwise proceed debug main file from the project folder. (y/n): ",
@@ -46,12 +47,16 @@ for _, language in ipairs({ "typescript", "javascript" }) do
 
         if not package_file then
           print("\n")
-          error("\npackage.json does not exists or verify your current working directory is your project folder.")
+          error("File 'package.json' does not exists or verify your current working directory is your project root folder.")
         end
-
         local content = package_file:read "*a"
         package_file:close()
         local package_json = json.decode(content)
+
+        if package_json["main"] == nil then
+          print("\n")
+          error("Property 'main' is not defined in the package.json file.")
+        end
 
         local debug_file = os.getenv("PWD") .. "/" .. package_json["main"]
         if io.open(debug_file, "r") then
@@ -59,17 +64,8 @@ for _, language in ipairs({ "typescript", "javascript" }) do
         end
 
         print("\n")
-        error("The main file of package.json does not exist.")
+        error("The main file specified as a value for the 'main' property in package.json does not exist.")
       end,
-      runtimeExecutable = 'node',
-      sourceMaps = true,
-      protocol = 'inspector',
-      outFiles = { "${workspaceFolder}/**/**/*", "!**/node_modules/**" },
-      skipFiles = { '<node_internals>/**', 'node_modules/**' },
-      resolveSourceMapLocations = {
-        "${workspaceFolder}/**",
-        "!**/node_modules/**",
-      },
       env = function()
         local node_env = vim.fn.input({
           prompt = "Enter the node environment you wish to debug in: ",

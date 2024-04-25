@@ -37,11 +37,11 @@ return require('packer').startup(function(use)
   use 'kkoomen/vim-doge'
 
   -- Debug Adapter Protocol client implementation for Neovim and UI.
-  use { "rcarriga/nvim-dap-ui", requires = {"mfussenegger/nvim-dap"} }
+  use { "rcarriga/nvim-dap-ui", requires = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" } }
 
   use {
     -- Highly extendable fuzzy finder over lists.
-    "nvim-telescope/telescope.nvim", tag = "0.1.4",
+    "nvim-telescope/telescope.nvim", tag = "0.1.6",
     requires = { {"nvim-lua/plenary.nvim"} }
   }
 

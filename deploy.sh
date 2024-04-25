@@ -183,8 +183,8 @@ then
   nvm use node # Switch to default node version.
   
   # Javascript debug adapter and configuration for nvim-dap
-  echo -e "\x1B[7mInstalling and configuring Javascript/Typescript debug adapter...\x1B[0m"
   echo -e "\n"
+  echo -e "\x1B[7mInstalling and configuring Javascript/Typescript debug adapter...\x1B[0m"
   debuggerReleaseVersion=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/microsoft/vscode-js-debug/releases/latest | awk -F "/" '{print $NF}')
   debuggerTarFile="js-debug-dap-$debuggerReleaseVersion.tar.gz"
   debuggerFileName="js-debug"

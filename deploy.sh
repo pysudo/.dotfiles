@@ -17,7 +17,7 @@ executeCommandList() {
   then
     return 0
   fi
-  
+
   local command
   for command in "$@" ; do
       $command
@@ -26,9 +26,9 @@ executeCommandList() {
 
 
 # Check if specified path exists in the file system.
-checkPath() { 
+checkPath() {
   local path=$1
-  
+
   if [[ $(find $path -maxdepth 0 2> /dev/null | wc -w) -eq 0 ]]
   then
     false
@@ -44,9 +44,9 @@ queryOverwrite() {
   then
     return 0
   fi
-  
+
   local path=$1
-  
+
   local response
   while ! [[ $response =~ ^(Y|n|N)$ ]]
   do
@@ -58,7 +58,7 @@ queryOverwrite() {
   then
    return 1
   fi
-  
+
   return 0
 }
 
@@ -74,19 +74,19 @@ modifyPath() {
   then
     shift
   fi
-  
+
   local path=$1
   shift
-  
+
   if ! checkPath $path
   then
     executeCommandList "$@"
     return 0
   fi
-  
+
   queryOverwrite $path
   local response=$?
-  
+
   if [[ ($forceModify = "f" || response -eq 0) && -d $path ]]
   then
     rm -rf $path
@@ -98,7 +98,7 @@ modifyPath() {
     executeCommandList "$@"
     return 0
   fi
-  
+
   return 1
 }
 
@@ -149,14 +149,6 @@ then
 fi
 
 
-# Plugin manager for neovim.
-echo -e "\n"
-echo -e "\x1B[7mInstalling Packer (Plugin Manager) for neovim...\x1B[0m"
-nvimPackerRepoPath=$HOME/.local/share/nvim/site/pack/packer/start/packer.nvim
-modifyPath $nvimPackerRepoPath \
-  "git clone --depth 1 https://github.com/wbthomason/packer.nvim $nvimPackerRepoPath"
-
-
 # Install nvm and Node
 echo -e "\n"
 echo -e "\x1B[7mInstalling nvm...\x1B[0m"
@@ -181,7 +173,7 @@ then
   echo -e "\x1B[7mInstalling node...\x1B[0m"
   nvm install --lts
   nvm use node # Switch to default node version.
-  
+
   # Javascript debug adapter and configuration for nvim-dap
   echo -e "\n"
   echo -e "\x1B[7mInstalling and configuring Javascript/Typescript debug adapter...\x1B[0m"
@@ -205,8 +197,7 @@ fi
   Current workaround involves autocmds inside 'post-update-hook' files within the 'after' directory.
 TODO
 # Install extensions for neovim using plugin manager.
-nvim -c "so $initDir/nvim/home/lua/main/packer.lua" -c "autocmd User PackerComplete quitall" -c "PackerSync"
-
+nvim  -c "autocmd User LazySync quitall" -c  'lua require("lazy").sync()'
 
 # Symbolic link configuration and plugins for neovim.
 echo -e "\n"

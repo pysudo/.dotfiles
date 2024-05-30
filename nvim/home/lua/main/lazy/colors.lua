@@ -1,11 +1,6 @@
-vim.cmd([[colorscheme gruvbox]])
-
-
 function SootheMySights()
   vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
   vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-
-  vim.cmd([[let g:gruvbox_invert_selection=0]])
 
   vim.cmd([[highlight CursorColumn cterm=NONE ctermbg=239]])
   vim.cmd([[highlight CursorLine cterm=NONE ctermbg=235]])
@@ -18,6 +13,13 @@ function SootheMySights()
   vim.cmd([[highlight PmenuThumb ctermbg=DarkGrey]])
 end
 
+-- A dark Vim/Neovim color scheme.
+return {
+  "KeitaNakamura/neodark.vim",
 
-SootheMySights()
+  config = function()
+    vim.cmd([[colorscheme neodark]])
 
+    SootheMySights()
+  end
+}

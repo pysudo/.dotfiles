@@ -192,13 +192,6 @@ else
 fi
 
 
-<< TODO
-  Instead for running post-update hooks for every 'VimEnter' event, execute it only once during deployment.
-  Current workaround involves autocmds inside 'post-update-hook' files within the 'after' directory.
-TODO
-# Install extensions for neovim using plugin manager.
-nvim  -c "autocmd User LazySync quitall" -c  'lua require("lazy").sync()'
-
 # Symbolic link configuration and plugins for neovim.
 echo -e "\n"
 neovimHomePath=$HOME/.config/nvim
@@ -243,6 +236,13 @@ else
   fi
 fi
 cd $initDir
+
+<< TODO
+  Instead for running post-update hooks for every 'VimEnter' event, execute it only once during deployment.
+  Current workaround involves autocmds inside 'post-update-hook' files within the 'after' directory.
+TODO
+# Install extensions for neovim using plugin manager.
+nvim  -c "autocmd User LazySync quitall" -c  'lua require("lazy").sync()'
 
 
 if ! uname -a | grep -qEi "(Microsoft|WSL|Darwin)"

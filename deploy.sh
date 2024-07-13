@@ -160,7 +160,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$nvmVersion/install.sh | b
 if [ $(uname -s) == "Darwin" ]; then
   source $HOME/.bash_profile
 else
-  source $HOME/.profile
+  source $HOME/.bashrc
 fi
 if [[ -d $HOME/.nvm && -f $HOME/.nvm/nvm.sh ]]
 then
@@ -278,14 +278,15 @@ modifyPath $bashConfigPath \
 
 if [ $(uname -s) == "Darwin" ]
 then
-  profileName=".bash_profile"
+  configName=".bash_profile"
 else
-  profileName=".profile"
+  configName=".bashrc"
 fi
-if [ -f "$HOME/$profileName" ]; then\
-  echo -e "\nif [ -f \"$HOME/.bashrc_local\" ]; then" >> $HOME/$profileName
-  echo -e "\x20\x20source $HOME/.bashrc_local" >> $HOME/$profileName
-  echo "fi" >> $HOME/$profileName
+if [ -f "$HOME/$configName" ]; then\
+  echo -e "\n# Custom bash configuration." >> $HOME/$configName
+  echo -e "if [ -f \"$HOME/.bashrc_local\" ]; then" >> $HOME/$configName
+  echo -e "\x20\x20source $HOME/.bashrc_local" >> $HOME/$configName
+  echo "fi" >> $HOME/$configName
 fi
 chmod u+x $HOME/.bashrc_local
 

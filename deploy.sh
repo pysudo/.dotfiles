@@ -282,13 +282,20 @@ then
 else
   configName=".bashrc"
 fi
-if [ -f "$HOME/$configName" ]; then\
+if [ -f "$HOME/$configName" ]; then
   echo -e "\n# Custom bash configuration." >> $HOME/$configName
   echo -e "if [ -f \"$HOME/.bashrc_local\" ]; then" >> $HOME/$configName
   echo -e "\x20\x20source $HOME/.bashrc_local" >> $HOME/$configName
   echo "fi" >> $HOME/$configName
 fi
 chmod u+x $HOME/.bashrc_local
+
+# Debian specific display manager remains in the background for i3wm.
+# https://github.com/sddm/sddm/issues/830
+# TODO: Narrow down to a specific display manager instead of an entire debian distro.
+if [[ -f "/etc/debian_version" && -n $DISPLAY ]]; then # $DISPLAY should not be a tty.
+  echo -e "\nxsetroot -solid black " >> $HOME/.profile
+fi
 
 
 echo -e "\n"

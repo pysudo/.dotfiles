@@ -2,6 +2,7 @@
 alias vi="nvim"
 alias vim="nvim"
 alias tmux='tmux -u'
+alias xclip='xclip -selection clipboard'
 
 
 # vi mode.
@@ -13,5 +14,10 @@ bind -x '"\f"':clear
 # Open current location with windows native explorer.
 if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
   alias open='explorer.exe'
+fi
+
+
+if [[ "$TERM_PROGRAM" != "tmux" ]]; then
+  tmux
 fi
 

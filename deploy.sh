@@ -128,6 +128,7 @@ if ! uname -a | grep -qEi "(Microsoft|WSL|Darwin)"
 then
   sudo apt install i3 -y
   sudo apt install xclip -y
+  sudo apt install copyq -y
 fi
 
 
@@ -257,6 +258,19 @@ then
   modifyPath $i3DirPath \
     "ln -s $i3ConfigPathSource ." \
     "echo -e Created symlink \x1B[1;36m$i3ConfigPathSource -> $i3DirPath\x1B[0m"
+
+  cd $initDir
+
+  # copyq.
+  echo -e "\n"
+  copyqShortcutsPath=$HOME/.config/copyq/copyq-commands.ini
+  modifyPath $copyqShortcutsPath \
+    "rm $copyqShortcutsPath" \
+    "ln -s $initDir/bash/copyq/copyq-commands.ini $copyqShortcutsPath" \
+    "mkdir -p $HOME/bin && ln -s $initDir/bash/copyq/copyq $HOME/bin" \
+    "chmod +x $HOME/bin/copyq" \
+    "echo -e Created symlink \x1B[1;36m$initDir/bash/copyq/copyq-commands.ini -> $copyqShortcutsPath\x1B[0m"
+    "echo -e Created symlink \x1B[1;36m$initDir/bash/copyq/copyqcopyq -> $HOME/bin/copyq\x1B[0m"
 
   cd $initDir
 fi

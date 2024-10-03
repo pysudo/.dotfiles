@@ -1,9 +1,18 @@
+# Prioritize binaries in the home directory.
+TEMP_PATH=""
+while read -d ':' p; do
+  if [[ $p != $HOME/bin ]]
+  then
+  TEMP_PATH=$TEMP_PATH:$p
+  fi
+done <<< "$PATH:"
+PATH=$HOME/bin$TEMP_PATH
+
 # Aliases
 alias vi="nvim"
 alias vim="nvim"
 alias tmux='tmux -u'
 alias xclip='xclip -selection clipboard'
-
 
 # vi mode.
 set -o vi
@@ -15,7 +24,6 @@ bind -x '"\f"':clear
 if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null ; then
   alias open='explorer.exe'
 fi
-
 
 if [[ "$TERM_PROGRAM" != "tmux" ]]; then
   tmux
